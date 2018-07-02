@@ -8,7 +8,7 @@ sudo apt-get install -y nodejs
 
 # Clone Git repo for demo app
 sudo apt-get install git -y
-git clone https://github.com/araffe/nodejs-demoapp.git
+git clone https://github.com/azurecitadel/nodejs-demoapp.git
 cd nodejs-demoapp/
 sudo npm install forever -g
 sudo npm install

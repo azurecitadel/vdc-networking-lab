@@ -96,10 +96,10 @@ The above command will provide a code as output. Open a browser and navigate to 
 for rg in Hub Spoke1 Spoke2 OnPrem NVA; do az group create -l westeurope -n VDC-$rg; done
 </pre>
 
-**3)** Once the resource groups have been deployed, you can deploy the main lab environment into these using a set of pre-defined ARM templates. The templates are available at https://github.com/Araffe/vdc-networking-lab if you wish to learn more about how the lab is defined. Essentially, a single master template (*VDC-Networking-Master.json*) is used to call a number of other templates, which in turn complete the deployment of virtual networks, virtual machines, load balancers, availability sets and VPN gateways. The templates also deploy a simple Node.js application on the spoke virtual machines. Use the following CLI command to deploy the template:
+**3)** Once the resource groups have been deployed, you can deploy the main lab environment into these using a set of pre-defined ARM templates. The templates are available at https://github.com/azurecitadel/vdc-networking-lab if you wish to learn more about how the lab is defined. Essentially, a single master template (*VDC-Networking-Master.json*) is used to call a number of other templates, which in turn complete the deployment of virtual networks, virtual machines, load balancers, availability sets and VPN gateways. The templates also deploy a simple Node.js application on the spoke virtual machines. Use the following CLI command to deploy the template:
 
 <pre lang="...">
-az group deployment create --name VDC-Create -g VDC-Hub --template-uri https://raw.githubusercontent.com/Araffe/vdc-networking-lab/master/VDC-Networking-Master.json
+az group deployment create --name VDC-Create -g VDC-Hub --template-uri https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/VDC-Networking-Master.json
 </pre>
 
 The template deployment process will take approximately 45 minutes. You can monitor the progress of the deployment from the portal (navigate to the *VDC-Hub* resource group and click on *Deployments* at the top of the Overview blade). Alternatively, the CLI can be used to monitor the template deployment progress as follows:
@@ -144,7 +144,7 @@ You are now ready to proceed to the next sections of the lab.
 
 In this section of the lab, we will explore the environment that has been deployed to Azure by the ARM templates. The lab environment has the following topology:
 
-![Main VDC Image](https://github.com/araffe/vdc-networking-lab/blob/master/images/VDC-Networking-Main.jpg "VDC Environment")
+![Main VDC Image](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/VDC-Networking-Main.jpg "VDC Environment")
 
 **Figure 1:** VDC Lab Environment
 
@@ -152,7 +152,7 @@ Note that each of the virtual networks resides in its own Azure resource group. 
 
 **1)** Use the Azure portal to explore the resources that have been created for you. Navigate to the various resource groups in turn to get an overall view of the resources deployed.
 
-![VDC-Spoke1 Resource Group Image](https://github.com/Araffe/vdc-networking-lab/blob/master/images/VDC-Spoke1-RG.jpg "VDC-Spoke1 Resource Group")
+![VDC-Spoke1 Resource Group Image](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/VDC-Spoke1-RG.jpg "VDC-Spoke1 Resource Group")
 
 **Figure 2:** VDC-Spoke1 Resource Group View
 
@@ -162,7 +162,7 @@ Note that each of the virtual networks resides in its own Azure resource group. 
 
 **3)** Navigate to the *Spoke1-LB* load balancer in the VDC-Spoke1 resource group. From here, navigate to 'Backend Pools' - you will see that both virtual machines are configured as part of the backend pool for the load balancer, as shown in figure 3.
 
-![LB Backend Pools](https://github.com/Araffe/vdc-networking-lab/blob/master/images/BackendPools.JPG "LB Backend Pools")
+![LB Backend Pools](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/BackendPools.JPG "LB Backend Pools")
 
 **Figure 3:** Load Balancer Backend Pools View
 
@@ -198,13 +198,13 @@ At this point, we can start to verify the connectivity we have set up. One of th
 
 **7)** Under 'Support + Troubleshooting', select 'Effective Routes'. You should see an entry for 'virtual network gateway', specifying an address range of 10.101.0.0/16, as shown in figure 4.
 
-![Effective Routes](https://github.com/Araffe/vdc-networking-lab/blob/master/images/EffectiveRoutes1.JPG "Effective Routes")
+![Effective Routes](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/EffectiveRoutes1.JPG "Effective Routes")
 
 **Figure 4:** OnPrem_VM Effective Routes
 
 Figure 5 shows a diagram explaining what we see when we view the effective routes of OnPrem_VM.
 
-![Routing from OnPrem_VM](https://github.com/Araffe/vdc-networking-lab/blob/master/images/EffectiveRoutes2.jpg "Routing from OnPrem_VM1")
+![Routing from OnPrem_VM](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/EffectiveRoutes2.jpg "Routing from OnPrem_VM1")
 
 **Figure 5:** Routing from OnPrem_VM1
 
@@ -274,7 +274,7 @@ ssh labuser@10.101.1.4
 
 This step should succeed, which proves connectivity between the On Premises and Hub VNets using the VPN connection. Figure 6 shows the connection we have just made.
 
-![SSH to NVA](https://github.com/Araffe/vdc-networking-lab/blob/master/images/SSHtoNVA.jpg "SSH to NVA")
+![SSH to NVA](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/SSHtoNVA.jpg "SSH to NVA")
 
 **Figure 6:** SSH from OnPrem_VM1 to vdc-csr-1
 
@@ -301,7 +301,7 @@ This attempt will fail - the reason for this is that we do not yet have the corr
 
 In this section, we will configure a number of *User Defined Routes*. A UDR in Azure is a routing table that you as the user define, potentially overriding the default routing that Azure sets up for you. UDRs are generally required any time a Network Virtual Appliance (NVA) is deployed, such as the Cisco CSR router we are using in our lab. The goal of this exercise is to allow traffic to flow from VMs residing in the Spoke VNets, to the VM in the On Premises VNet. This traffic will flow through the Cisco CSR router in the Hub VNet. The diagram in figure 7 shows what we are trying to achieve in this section.
 
-![User Defined Routes](https://github.com/Araffe/vdc-networking-lab/blob/master/images/UDR.jpg "User Defined Routes")
+![User Defined Routes](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/UDR.jpg "User Defined Routes")
 
 **Figure 7:** User Defined Routes
 
@@ -323,7 +323,7 @@ Click 'Submit' to create the route. Repeat the process for Spoke 2 as follows:
 
 Figure 8 shows the route creation screen.
 
-![Defining UDRs](https://github.com/Araffe/vdc-networking-lab/blob/master/images/UDR2.jpg "Defining UDRs")
+![Defining UDRs](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/UDR2.jpg "Defining UDRs")
 
 **Figure 8:** Defining UDRs
 
@@ -383,7 +383,7 @@ It turns out that there is an additional setting we must configure on the VNet p
 
 **3)** In the Azure portal, navigate to *Spoke1_VNet* in the 'VDC-Spoke1' resource group. Select 'peerings' and then select the 'to-Hub_Vnet' peering. You'll see that the option entitled *Use Remote Gateways* is unchecked. Checking this option allows the VNet to use a gateway in a *remote* virtual network - as we need our Spoke VNets to use a gateway residing in the Hub VNet, this is exactly what we need, so check the box as shown in figure 9.
 
-![Use Remote GW](https://github.com/Araffe/vdc-networking-lab/blob/master/images/UseRemoteGW.JPG "Use Remote GW")
+![Use Remote GW](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/UseRemoteGW.JPG "Use Remote GW")
 
 **Figure 9:** Use Remote Gateway Option
 
@@ -425,7 +425,7 @@ Our NSG will define two inbound rules - one for HTTP and another for TCP port 30
 - Destination port range: *80*
 - Action: *Allow*
 
-![NSG Rule1](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NSG1.jpg "NSG Rule1")
+![NSG Rule1](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NSG1.jpg "NSG Rule1")
 
 **Figure 10:** Network Security Group - HTTP Rule
 
@@ -447,7 +447,7 @@ Our NSG will define two inbound rules - one for HTTP and another for TCP port 30
 
 **5)** Select 'Network Interfaces'. Click the 'Associate' button and choose 'vdc-csr-1-Nic0'.
 
-![NSG Associate Subnet](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NSG2.jpg "NSG Associate Subnet")
+![NSG Associate Subnet](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NSG2.jpg "NSG Associate Subnet")
 
 **Figure 11:** Network Security Group - Associating with a Subnet
 
@@ -475,13 +475,13 @@ Azure Security Center is a feature built in to Azure which allows administrators
 
 **2)** The overview section of the Security Center shows an 'at-a-glance' view of any security recommendations, alerts and prevention items relating to compute, storage, networking and applications.
 
-![Azure Security Center](https://github.com/Araffe/vdc-networking-lab/blob/master/images/SecCenter.jpg "Azure Security Center")
+![Azure Security Center](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/SecCenter.jpg "Azure Security Center")
 
 **Figure 12:** Azure Security Center - Overview Page
 
 **3)** Click on 'Recommendations' in the Security Center menu. You will see a list of recommendations relating to various areas of the environment - for example, the need to add Network Security Groups on subnets and VMs, or the recommendation to apply disk encryption to VMs.
 
-![Azure Security Recommendations](https://github.com/Araffe/vdc-networking-lab/blob/master/images/SecRecommendations.jpg "Azure Security Recommendations")
+![Azure Security Recommendations](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/SecRecommendations.jpg "Azure Security Recommendations")
 
 **Figure 13:** Azure Security Center - Recommendations
 
@@ -497,7 +497,7 @@ Azure resource policies are used to place restrictions on what actions can be ta
 
 **3)** Scroll down to the policy entitled 'Allowed Resource Types', click the '...', select 'View Definition' and then click on 'JSON'. This shows you the JSON policy document - this simple example takes a list of resource types and prevents the ability to create them.
 
-![Azure Resource Policy Example](https://github.com/Araffe/vdc-networking-lab/blob/master/images/armpolicies1.jpg "Azure Resource Policy Example")
+![Azure Resource Policy Example](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/armpolicies1.jpg "Azure Resource Policy Example")
 
 **Figure 14:** Example Resource Policy - Allowed Resource Types
 
@@ -545,7 +545,7 @@ In this exercise, a file has been created on Github containing the above policy 
 **1)** Using the AZ CLI, enter the following command:
 
 <pre lang="...">
- az policy definition create --name EnforceNaming --display-name EnforceNamingConvention --rules https://raw.githubusercontent.com/Araffe/vdc-networking-lab/master/naming-policy.json
+ az policy definition create --name EnforceNaming --display-name EnforceNamingConvention --rules https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/naming-policy.json
 </pre>
 
 **2)** Assign the policy to the VDC-Hub resource group using the following AZ CLI command:
@@ -601,7 +601,7 @@ In addition to the ability to define and assign resource policies, Azure Policy 
 
 **Note: it can take around 30 - 60 minutes for the compliance information to be updated, so you may wish to return to this section.**
 
-![Azure Policy - Compliance](https://github.com/Araffe/vdc-networking-lab/blob/master/images/PolicyCompliance.jpg "Azure Policy - Compliance")
+![Azure Policy - Compliance](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/PolicyCompliance.jpg "Azure Policy - Compliance")
 
 **Figure 15:** Azure Policy - Compliance View
 
@@ -621,19 +621,19 @@ Before we can use the tools in this section, we must first enable Network Watche
 
 **2)** You should see your Azure subscription listed in the right hand pane - find your region and then click on the'...' on the right hand side. Click 'Enable Network Watcher':
 
-![Enabling Network Watcher](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NetWatcher1.jpg "Enabling Network Watcher")
+![Enabling Network Watcher](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NetWatcher1.jpg "Enabling Network Watcher")
 
 **Figure 16:** Enabling Network Watcher
 
 **3)** On the left hand side of screen under 'Monitoring', click on 'Topology'. Select your subscription and then the resource group 'VDC-Hub' and 'Hub_Vnet'. You will see a graphical representation of the topology on the screen:
 
-![Network Topology](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NetWatcherTopo.jpg "Network Topology")
+![Network Topology](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NetWatcherTopo.jpg "Network Topology")
 
 **Figure 17:** Network Topology View in Network Watcher
 
 **4)** A useful feature of Network Watcher is the ability to view network related subscription limits and track your resource utilisation against these. In the left hand menu, select 'Network Subscription Limit'. You will see a list of resources, including virtual networks, public IP addresses and more:
 
-![Network Subscription Limits](https://github.com/Araffe/vdc-networking-lab/blob/master/images/SubLimits.jpg "Network Subscription Limits")
+![Network Subscription Limits](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/SubLimits.jpg "Network Subscription Limits")
 
 **Figure 18:** Network Related Subscription Limits
 
@@ -652,7 +652,7 @@ az storage account create --name storage-account-name -g VDC-Hub --sku Standard_
 
 **3)** Click on the NSG and then in the settings screen, change the status to 'On'. Select the storage account you created in step 1 and change the retention to 5 days. Click 'Save'.
 
-![NSG Flow Log Settings](https://github.com/Araffe/vdc-networking-lab/blob/master/images/FlowLogs1.jpg "NSG Flow Log Settings")
+![NSG Flow Log Settings](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/FlowLogs1.jpg "NSG Flow Log Settings")
 **Figure 19:** NSG Flow Log Settings
 
 **4)** In order to view data from the NSG logs, we must initiate some traffic that will flow through the NSG. SSH to the OnPrem_VM1 virtual machine as described earlier in the lab. From here, use the curl command to view the demo app on Spoke1\_VM1 (through the load balancer) and attempt to SSH to the same VM (this will fail):
@@ -664,7 +664,7 @@ ssh labuser@10.1.1.5
 
 **5)** NSG Flow Logs are stored in the storage account you configured earlier in this section - in order to view the logs, you must download the JSON file from Blob storage. You can do this either using the Azure portal, or using the *Microsoft Azure Storage Explorer* program available as a free download from http://storageexplorer.com/. If using the Azure portal, navigate to the storage account you created earlier and select 'Blobs'. You will see a container named 'insights-logs-networksecuritygroupflowevent'. Navigate through the directory structure (structured as subscription / resource group / day / month / year / time) until you reach a file named 'PT1H.json'. Download this file to your local machine.
 
-![NSG Log Download](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NSGLogs.jpg "NSG Log Download")
+![NSG Log Download](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NSGLogs.jpg "NSG Log Download")
 
 **Figure 20:** NSG Flow Log Download
 
@@ -706,7 +706,7 @@ Another useful feature of Network Watcher is the ability to trace the next hop f
 
 **3)** The resulting output should display *10.101.2.4* as the next hop. This is the IP address of our Network Virtual Appliance (Cisco CSR) and corresponds to the User Defined Route we configured earlier.
 
-![Next Hop Tracking](https://github.com/Araffe/vdc-networking-lab/blob/master/images/NextHop.jpg "Next Hop Tracking")
+![Next Hop Tracking](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/NextHop.jpg "Next Hop Tracking")
 
 **Figure 21:** Next Hop Tracking
 
@@ -718,13 +718,13 @@ Azure Monitor is a tool that provides central monitoring of most Azure services,
 
 **1)** Start by using the Azure portal to navigate to the Azure Monitor view by expanding the left hand main menu and selecting 'Monitor'. If it is not shown, select 'More Services' and search for it. Select 'Activity Log' from the left hand menu. This shows a filterable view of all activity in your subscription - you can filter based on timespan, event severity, resource type and operation. Modify some of the filter fields in this screen to narrow down the search criteria.
 
-![Azure Monitor Activity Log](https://github.com/Araffe/vdc-networking-lab/blob/master/images/AzMon1.jpg "Azure Monitor Activity Log")
+![Azure Monitor Activity Log](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/AzMon1.jpg "Azure Monitor Activity Log")
 
 **Figure 22:** Azure Monitor Activity Log
 
 **2)** In the Azure Monitor menu on the left, select 'Metrics (Preview)'. In the 'resource' box at the top of the screen, search for 'onprem' and then select the 'OnPrem1_VM' virtual machine in the drop-down menu. Select 'host' as the sub-service and then 'Percentage CPU' as the metric.
 
-![Azure Monitor CPU Metrics](https://github.com/Araffe/vdc-networking-lab/blob/master/images/AzMonCPU.jpg "Azure Monitor CPU Metrics")
+![Azure Monitor CPU Metrics](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/AzMonCPU.jpg "Azure Monitor CPU Metrics")
 
 **Figure 23:** Azure Monitor CPU Metrics
 
@@ -757,7 +757,7 @@ stress: info: [61727] dispatching hogs: 50 cpu, 0 io, 0 vm, 0 hdd
 
 **12)** After approximately 5 minutes, you should receive an email alerting you to the high CPU on your VM:
 
-![Azure Monitor CPU Alert](https://github.com/Araffe/vdc-networking-lab/blob/master/images/AzMonAlert.jpg "Azure Monitor CPU Alert")
+![Azure Monitor CPU Alert](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/AzMonAlert.jpg "Azure Monitor CPU Alert")
 
 **Figure 24:** Azure Monitor CPU Alert
 
@@ -769,7 +769,7 @@ A critical part of any data centre - whether on-premises or in the cloud - is ma
 
 In this lab, we will create three groups of users, as shown in figure 23:
 
-![VDC Users and Groups](https://github.com/Araffe/vdc-networking-lab/blob/master/images/Identity.jpg "VDC Users and Groups")
+![VDC Users and Groups](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/Identity.jpg "VDC Users and Groups")
 
 **Figure 25:** VDC Lab Users and Groups
 
@@ -787,7 +787,7 @@ We'll start by configuring a number of users and groups.
 
 **1)** To begin, we'll verify our domain name in the Azure portal. On the left hand side of the portal screen, click 'More Services' and then search for 'Azure Active Directory'. Click on 'Domain Name' and you will see the domain assigned to your Azure AD directory.
 
-![AAD Domain Name](https://github.com/Araffe/vdc-networking-lab/blob/master/images/DomainName.jpg "AAD Domain Name")
+![AAD Domain Name](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/DomainName.jpg "AAD Domain Name")
 
 **Figure 26:** Azure AD Domain Name
 
@@ -871,7 +871,7 @@ Now that we have our users and groups in place, it's time to make use of them by
 
 **3)** Click 'Add' again, but this time select the 'Reader' role and then choose the 'AppDev' group.
 
-![Hub RBAC](https://github.com/Araffe/vdc-networking-lab/blob/master/images/Hub-RBAC.jpg "Hub RBAC")
+![Hub RBAC](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/Hub-RBAC.jpg "Hub RBAC")
 
 **Figure 27:** Hub Role Based Access Control
 

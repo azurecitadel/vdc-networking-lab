@@ -54,7 +54,7 @@
       "type": "string"
     },
     "scriptURL": {
-      "defaultValue": "https://raw.githubusercontent.com/araffe/vdc-networking-lab/master/DemoAppConfig.sh",
+      "defaultValue": "https://raw.githubusercontent.com/araazurecitadelffe/vdc-networking-lab/master/DemoAppConfig.sh",
       "type": "string"
     },
     "scriptCommand": {
