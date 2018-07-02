@@ -1,0 +1,452 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "defaultValue": "labuser",
+            "type": "string",
+            "metadata": {
+                "description": "Username for VMs"
+            }
+        },
+        "adminPassword": {
+            "defaultValue": "M1crosoft123",
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for VMs"
+            }
+        },
+        "hubRG": {
+            "defaultValue": "VDC-Hub",
+            "type": "string",
+            "metadata": {
+                "description": "Resource group name for Hub"
+            }
+        },
+        "spoke1RG": {
+            "defaultValue": "VDC-Spoke1",
+            "type": "string",
+            "metadata": {
+                "description": "Resource group name for Spoke1"
+            }
+        },
+        "spoke2RG": {
+            "defaultValue": "VDC-Spoke2",
+            "type": "string",
+            "metadata": {
+                "description": "Resource group name for Spoke2"
+            }
+        },
+        "onPremRG": {
+            "defaultValue": "VDC-OnPrem",
+            "type": "string",
+            "metadata": {
+                "description": "Resource group name for On-Premises"
+            }
+        },
+        "nvaRG": {
+            "defaultValue": "VDC-NVA",
+            "type": "string",
+            "metadata": {
+                "description": "Resource group name for NVA deployment"
+            }
+        },
+        "createVPNGateway": {
+            "defaultValue": "yes",
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "metadata": {
+                "description": "Controls whether VPN gateways will be deployed"
+            }
+        }
+    },
+    "variables": {
+        "baseURL": "https://raw.githubusercontent.com/Araffe/vdc-networking-lab/master/",
+        "hubVnetTemplateURL": "[concat(variables('baseURL'), 'Hub-VNet.json')]",
+        "spokeVnetTemplateURL": "[concat(variables('baseURL'), 'Spoke-VNet.json')]",
+        "vnetPeeringHubTemplateURL": "[concat(variables('baseURL'), 'VNet-Peering-Hub.json')]",
+        "vnetPeeringSpokeTemplateURL": "[concat(variables('baseURL'), 'VNet-Peering-Spoke.json')]",
+        "vpnGwTemplateURL": "[concat(variables('baseURL'), 'vpn-gw.json')]",
+        "singleVMTemplateURL": "[concat(variables('baseURL'), 'Single-VM.json')]",
+        "multiVMTemplateURL": "[concat(variables('baseURL'), 'MultiVM-LoadBalanced.json')]",
+        "nvaTemplateURL": "[concat(variables('baseURL'), 'Deploy-NVAs.json')]",
+        "hubVnetTemplate": {
+            "vnetName": {
+                "value": "Hub_VNet"
+            },
+            "vnetOctets": {
+                "value": "10.101"
+            }
+        },
+        "onPremVnetTemplate": {
+            "vnetName": {
+                "value": "OnPrem_VNet"
+            },
+            "vnetOctets": {
+                "value": "10.102"
+            }
+        },
+        "spoke1VnetTemplate": {
+            "vnetName": {
+                "value": "Spoke1_VNet"
+            },
+            "vnetOctets": {
+                "value": "10.1"
+            }
+        },
+        "spoke2VnetTemplate": {
+            "vnetName": {
+                "value": "Spoke2_VNet"
+            },
+            "vnetOctets": {
+                "value": "10.2"
+            }
+        },
+        "spoke1PeeringTemplate": {
+            "spokeVnetName": {
+                "value": "Spoke1_VNet"
+            }
+        },
+        "spoke2PeeringTemplate": {
+            "spokeVnetName": {
+                "value": "Spoke2_VNet"
+            }
+        },
+        "vpnGwTemplateHub": {
+            "vnetName": {
+                "value": "Hub_VNet"
+            },
+            "gwName": {
+                "value": "Hub_GW1"
+            },
+            "PIPName": {
+                "value": "Hub_VNet-gwPip"
+            },
+            "asNumber": {
+                "value": "65514"
+            }
+        },
+        "vpnGwTemplateOnPrem": {
+            "vnetName": {
+                "value": "OnPrem_VNet"
+            },
+            "gwName": {
+                "value": "OnPrem_GW1"
+            },
+            "PIPName": {
+                "value": "OnPrem_VNet-gwPip"
+            },
+            "RGName": {
+                "value": "VDC-OnPrem"
+            },
+            "asNumber": {
+                "value": "65515"
+            }
+        },
+        "vmTemplateSpoke1": {
+            "vmName": {
+                "value": "Spoke1-VM"
+            },
+            "lbPIPName": {
+                "value": "Spoke1-LB-PIP"
+            },
+            "lbName": {
+                "value": "Spoke1-LB"
+            },
+            "vnetName": {
+                "value": "Spoke1_VNet"
+            },
+            "subnetName": {
+                "value": "Spoke1_VNet-Subnet"
+            },
+            "vmType": {
+                "value": "ubuntu"
+            },
+            "adminUsername": {
+                "value": "[parameters('adminUsername')]"
+            },
+            "adminPassword": {
+                "value": "[parameters('adminPassword')]"
+            },
+            "availabilitySetName": {
+                "value": "Spoke1-AvailabilitySet"
+            }
+        },
+        "vmTemplateSpoke2": {
+            "vmName": {
+                "value": "Spoke2-VM"
+            },
+            "lbPIPName": {
+                "value": "Spoke2-LB-PIP"
+            },
+            "lbName": {
+                "value": "Spoke2-LB"
+            },
+            "vnetName": {
+                "value": "Spoke2_VNet"
+            },
+            "subnetName": {
+                "value": "Spoke2_VNet-Subnet"
+            },
+            "vmType": {
+                "value": "ubuntu"
+            },
+            "adminUsername": {
+                "value": "[parameters('adminUsername')]"
+            },
+            "adminPassword": {
+                "value": "[parameters('adminPassword')]"
+            },
+            "availabilitySetName": {
+                "value": "Spoke2-AvailabilitySet"
+            }
+        },
+        "vmTemplateOnPrem": {
+            "vmName": {
+                "value": "OnPrem-VM1"
+            },
+            "vnetName": {
+                "value": "OnPrem_VNet"
+            },
+            "subnetName": {
+                "value": "OnPrem_VNet-Subnet1"
+            },
+            "vmType": {
+                "value": "ubuntu"
+            },
+            "adminUsername": {
+                "value": "[parameters('adminUsername')]"
+            },
+            "adminPassword": {
+                "value": "[parameters('adminPassword')]"
+            },
+            "vmPIPName": {
+                "value": "OnPrem-VM1-PIP"
+            }
+        },
+        "nvaTemplate": {
+            "vnetName": {
+                "value": "Hub_VNet"
+            },
+            "adminUsername": {
+                "value": "[parameters('adminUsername')]"
+            },
+            "adminPassword": {
+                "value": "[parameters('adminPassword')]"
+            },
+            "VDCResourceGroup": {
+                "value": "[resourceGroup().name]"
+            }
+        }
+    },
+    "resources": [
+        {
+            "comments": "Create Hub VNet",
+            "name": "hubVnet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('hubVnetTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('hubVnetTemplate')]"
+            }
+        },
+        {
+            "comments": "Create OnPremises VNet",
+            "name": "onPremVnet",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('onPremRG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('hubVnetTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('onPremVnetTemplate')]"
+            }
+        },
+        {
+            "comments": "Create Spoke1 VNet",
+            "name": "spoke1Vnet",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke1RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('spokeVnetTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('spoke1VnetTemplate')]"
+            }
+        },
+        {
+            "comments": "create VNet peering - Hub_VNet to Spoke VNets",
+            "name": "Hub-Spoke-Peering",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetPeeringHubTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                }
+            },
+            "dependsOn": [
+                "spoke1Vnet",
+                "hubVnet"
+            ]
+        },
+        {
+            "comments": "create VNet peering - Spoke1 VNet to Hub VNet",
+            "name": "Spoke1-Hub-Peering",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke1RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetPeeringSpokeTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('spoke1PeeringTemplate')]"
+            },
+            "dependsOn": [
+                "spoke1Vnet",
+                "hubVnet"
+            ]
+        },
+        {
+            "comments": "create VNet peering - Spoke2 VNet to Hub VNet",
+            "name": "Spoke2-Hub-Peering",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke2RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetPeeringSpokeTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('spoke2PeeringTemplate')]"
+            },
+            "dependsOn": [
+                "spoke2Vnet",
+                "hubVnet"
+            ]
+        },
+        {
+            "comments": "Create Spoke2 VNet",
+            "name": "spoke2Vnet",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke2RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('spokeVnetTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('spoke2VnetTemplate')]"
+            }
+        },
+        {
+            "comments": "Create VPN gateway in Hub_VNet1.",
+            "name": "Hub_GW1",
+            "condition": "[equals(parameters('createVPNGateway'), 'yes')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vpnGwTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('vpnGwTemplateHub')]"
+            },
+            "dependsOn": [
+                "hubVnet"
+            ]
+        },
+        {
+            "comments": "Create VPN gateway in OnPrem_VNet1.",
+            "name": "OnPrem_GW1",
+            "resourceGroup": "[parameters('onPremRG')]",
+            "condition": "[equals(parameters('createVPNGateway'), 'yes')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vpnGwTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('vpnGwTemplateOnPrem')]"
+            },
+            "dependsOn": [
+                "onPremVnet"
+            ]
+        },
+        {
+            "comments": "Create two VMs in an availability set with load balancing in Spoke 1 VNet",
+            "name": "createSpoke1VMs",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke1RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('multiVMTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('vmTemplateSpoke1')]"
+            },
+            "dependsOn": [
+                "spoke1Vnet"
+            ]
+        },
+        {
+            "comments": "Create two VMs in an availability set with load balancing in Spoke 2 VNet",
+            "name": "createSpoke2VMs",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('spoke2RG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('multiVMTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('vmTemplateSpoke2')]"
+            },
+            "dependsOn": [
+                "spoke2Vnet"
+            ]
+        },
+        {
+            "comments": "Create single VM in on-premises VNet",
+            "name": "createOnPremVM",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('onPremRG')]",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('singleVMTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": "[variables('vmTemplateOnPrem')]"
+            },
+            "dependsOn": [
+                "onPremVnet"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "defaultValue": "Spoke_VNet",
+            "type": "string",
+            "metadata": {
+                "description": "Spoke VNet name prefix."
+            }
+        },
+        "vnetOctets": {
+            "defaultValue": "10.1",
+            "type": "string",
+            "metadata": {
+                "description": "First two octets of the spoke vnet IP space."
+            }
+        }
+    },
+    "resources": [
+        {
+            "comments": "Spoke VNet with 2 subnets",
+            "name": "[concat(parameters('vnetName'))]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('vnetOctets'), '.0.0/16')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[concat(parameters('vnetName'), '-Subnet1')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('vnetOctets'), '.1.0/24')]"
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('vnetName'), '-Subnet2')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('vnetOctets'), '.2.0/24')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

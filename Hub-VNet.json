@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "defaultValue": "Hub_VNet",
+            "type": "string",
+            "metadata": {
+                "description": "VNet name prefix."
+            }
+        },
+        "vnetOctets": {
+            "defaultValue": "10.101",
+            "type": "string",
+            "metadata": {
+                "description": "First two octets of the VNet IP space."
+            }
+        }
+    },
+    "resources": [
+        {
+            "comments": "VNet with 2 subnets and gateway subnet",
+            "name": "[concat(parameters('vnetName'))]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('vnetOctets'), '.0.0/16')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[concat(parameters('vnetName'), '-Subnet1')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('vnetOctets'), '.1.0/24')]"
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('vnetName'), '-Subnet2')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('vnetOctets'), '.2.0/24')]"
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('vnetOctets'), '.3.0/24')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

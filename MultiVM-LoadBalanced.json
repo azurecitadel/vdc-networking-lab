@@ -1,0 +1,259 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "defaultValue": "VNet",
+      "type": "string"
+    },
+    "subnetName": {
+      "defaultValue": "Subnet",
+      "type": "string"
+    },
+    "storageAccountName": {
+      "defaultValue": "[concat('storage',uniqueString(resourceGroup().id))]",
+      "type": "string"
+    },
+    "adminUsername": {
+      "defaultValue": null,
+      "type": "string"
+    },
+    "adminPassword": {
+      "defaultValue": null,
+      "type": "securestring"
+    },
+    "vmName": {
+      "defaultValue": "vm",
+      "type": "string"
+    },
+    "availabilitySetName": {
+      "defaultValue": "AvSet",
+      "type": "string"
+    },
+    "spokeNicCount": {
+      "defaultValue": 2,
+      "type": "int"
+    },
+    "vmCount": {
+      "defaultValue": 2,
+      "type": "int"
+    },
+    "vmType": {
+      "defaultValue": "ubuntu",
+      "type": "string",
+      "allowedValues": [
+        "ubuntu"
+      ]
+    },
+    "lbPIPName": {
+      "defaultValue": "lbPIP",
+      "type": "string"
+    },
+    "lbName": {
+      "defaultValue": "lb",
+      "type": "string"
+    },
+    "scriptURL": {
+      "defaultValue": "https://raw.githubusercontent.com/araffe/vdc-networking-lab/master/DemoAppConfig.sh",
+      "type": "string"
+    },
+    "scriptCommand": {
+      "defaultValue": "sh DemoAppConfig.sh",
+      "type": "string"
+    }
+  },
+  "variables": {
+    "nicName": "[concat(parameters('vmName'),'-nic')]",
+    "diskName": "[concat(parameters('vmName'),'-disk')]",
+    "apiVersion": "2016-03-30"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-04-01",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('vmName'), copyIndex(1), '-nic')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', parameters('lbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('subnetName'), '1')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/backendAddressPools/BackendPool')]"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "copy": {
+        "name": "nicLoop",
+        "count": "[parameters('spokeNicCount')]"
+      }
+    },
+    {
+      "comments": "Create public IP address for load balancer",
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('lbPIPName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "comments": "Create load balancer for spokes",
+      "name": "[parameters('lbName')]",
+      "apiVersion": "2017-03-01",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('lbPIPName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('subnetName'), '1')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "BackendPool"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "DemoAppRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/frontendIpConfigurations/loadBalancerFrontEnd')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/backendAddressPools/BackendPool')]"
+              },
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/probes/DemoAppProbe')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 3000,
+              "idleTimeoutInMinutes": 15
+            }
+          }
+        ],
+        "probes": [
+          {
+            "properties": {
+              "protocol": "Http",
+              "port": 3000,
+              "intervalInSeconds": 15,
+              "numberOfProbes": 2,
+              "requestPath": "/"
+            },
+            "name": "DemoAppProbe"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetName')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "platformFaultDomainCount": "2",
+        "platformUpdateDomainCount": "2",
+        "managed": "true"
+      }
+    },
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmName'), copyIndex(1))]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', parameters('vmName'), copyIndex(1) ,'-nic')]",
+        "[resourceId('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_A0"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmName'), copyIndex(1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "canonical",
+            "offer": "UbuntuServer",
+            "sku": "17.10",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'), copyIndex(1), '-nic'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "false"
+          }
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+        }
+      },
+      "copy": {
+        "name": "vmLoop",
+        "count": "[parameters('vmCount')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'), copyIndex(1), '/script')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('scriptURL')]"
+          ],
+          "commandToExecute": "[parameters('scriptCommand')]"
+        }
+      },
+      "dependsOn": [
+        "[concat(parameters('vmName'), copyIndex(1))]"
+      ],
+      "copy": {
+        "name": "[concat(parameters('vmName'), '-script')]",
+        "count": "[parameters('vmCount')]"
+      }
+    }
+  ]
+}
