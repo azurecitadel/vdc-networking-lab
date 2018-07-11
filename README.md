@@ -73,6 +73,12 @@ Before proceeding with this lab, please make sure you have fulfilled all of the 
 az provider register --namespace Microsoft.Insights
 </pre>
 
+You can check on the current status for the provider using this command
+
+<pre lang="...">
+az provider show --namespace Microsoft.Insights --query registrationState --output tsv
+</pre>
+
 # Initial Lab Setup <a name="setup"></a>
 
 **Important: The initial lab setup using ARM templates takes around 45 minutes - please initiate this process as soon as possible to avoid a delay in starting the lab.**
@@ -99,7 +105,7 @@ for rg in Hub Spoke1 Spoke2 OnPrem NVA; do az group create -l westeurope -n VDC-
 **3)** Once the resource groups have been deployed, you can deploy the main lab environment into these using a set of pre-defined ARM templates. The templates are available at https://github.com/azurecitadel/vdc-networking-lab if you wish to learn more about how the lab is defined. Essentially, a single master template (*VDC-Networking-Master.json*) is used to call a number of other templates, which in turn complete the deployment of virtual networks, virtual machines, load balancers, availability sets and VPN gateways. The templates also deploy a simple Node.js application on the spoke virtual machines. Use the following CLI command to deploy the template:
 
 <pre lang="...">
-az group deployment create --name VDC-Create -g VDC-Hub --template-uri https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/VDC-Networking-Master.json
+az group deployment create --name VDC-Create -g VDC-Hub --template-uri https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/VDC-Networking-Master.json --verbose
 </pre>
 
 The template deployment process will take approximately 45 minutes. You can monitor the progress of the deployment from the portal (navigate to the *VDC-Hub* resource group and click on *Deployments* at the top of the Overview blade). Alternatively, the CLI can be used to monitor the template deployment progress as follows:
