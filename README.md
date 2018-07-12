@@ -319,7 +319,7 @@ We'll create our first User Defined Route using the Azure portal, with subsequen
 - Address Prefix: *10.1.0.0/16*
 - Next Hop Type: *Virtual Network Gateway*
 
-Click 'Submit' to create the route. Repeat the process for Spoke 2 as follows:
+Click 'OK' to create the route. Repeat the process for Spoke 2 as follows:
 
 - Route Name: *Spoke2-Route*
 - Address Prefix: *10.2.0.0/16*
