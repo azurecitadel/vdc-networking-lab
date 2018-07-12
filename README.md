@@ -311,7 +311,7 @@ In this section, we will configure a number of *User Defined Routes*. A UDR in A
 
 We'll create our first User Defined Route using the Azure portal, with subsequent UDRs configured using the Azure CLI.
 
-**1)** In the Azure portal, navigate to the *VDC-OnPrem* resource group. Click 'Add' and then search for 'Route Table'. Select this and then create a new route table named *OnPrem-UDR*. Once complete, navigate to the newly created UDR in the VDC-OnPrem resource group and select it.
+**1)** In the Azure portal, navigate to the *VDC-OnPrem* resource group. Click 'Add' and then search for 'Route Table'. Select this and then create a new route table named *OnPrem-UDR*, making sure that you have selected the existing *VDC-OnPrem* resource group. Once complete, navigate to the newly created UDR and select it.
 
 **2)** Click on 'Routes' and then 'Add'. Create a new route with the following parameters:
 
