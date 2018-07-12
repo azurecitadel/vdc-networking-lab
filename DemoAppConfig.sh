@@ -2,8 +2,8 @@
 
 echo "Patching OS"
 sudo apt-get update --quiet
-sudo apt-get dist-upgrade --quiet
-sudo apt-get autoremove -qq
+sudo apt-get dist-upgrade --quiet --yes
+sudo apt-get autoremove -qq 
 
 echo "Installing aptitude"
 sudo apt-get install --yes aptitude
