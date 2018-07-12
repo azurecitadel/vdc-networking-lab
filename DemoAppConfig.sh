@@ -1,15 +1,32 @@
-# Update system
-sudo apt-get update
+#!/bin/bash
 
-# Install node.js & NPM
-sudo apt-get install npm -y
+echo "Patching OS"
+sudo apt-get update --quiet
+sudo apt-get dist-upgrade --quiet
+sudo apt-get autoremove -qq
+
+echo "Installing aptitude"
+sudo apt-get install --yes aptitude
+
+echo "Running setup script"
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
-sudo apt-get install -y nodejs
+
+# Install node.js
+echo "Installing nodejs - now includes npm"
+sudo aptitude install nodejs --quiet --assume-yes
 
 # Clone Git repo for demo app
-sudo apt-get install git -y
+echo "Installing git and cloning the app"
+sudo aptitude install git --quiet --assume-yes
+
+echo "Cloning the app"
 git clone https://github.com/araffe/nodejs-demoapp.git
 cd nodejs-demoapp/
-sudo npm install forever -g
-sudo npm install
+
+echo "Installing forever"
+sudo npm install forever -g &>/dev/null
+sudo npm install &>/dev/null
+forever --version
+
+echo "Run the app"
 forever start ./bin/www
