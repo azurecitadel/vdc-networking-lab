@@ -293,13 +293,13 @@ The second command is more complicated, using a JMESPATH query to customise the 
 
 The VM's IP address is expected to be 10.1.1.5 or 10.1.1.6 depending on the order in which the VM builds completed.
 
-**9)** Log back in to OnPrem_VM1, and then attempt to connect to the private IP address of the virtual machine within the Spoke 1 Vnet:
+**9)** Log back in to OnPrem_VM1, and then attempt to connect to the private IP address of the virtual machine within the Spoke 1 vNet.  (Note that this should fail.)
 
 <pre lang="...">
 ssh labuser@10.1.1.5
 </pre>
 
-This attempt will fail - the reason for this is that we do not yet have the correct routing in place to allow connectivity between the On Premises VNet and the Spoke VNets via the hub / NVA. In the next section, we will configure the routing required to achieve this.
+The reason for the failure is that we do not yet have the correct routing in place to allow connectivity between the On Premises VNet and the Spoke VNets via the hub / NVA. In the next section, we will configure the routing required to achieve this.
 
 ## 2.3: Configure User Defined Routes <a name="udr"></a>
 
