@@ -224,18 +224,16 @@ In our VDC environment, we are using Cisco CSR1000V routers in the Hub virtual n
 
 In the initial lab setup, you provisioned the CSR1000V router in the Hub virtual network, however it must now be configured in order to route traffic. Follow the steps in this section to configure the CSR1000V.
 
-**1)** To log on to the CSR1000V, you'll need to obtain the public IP address assigned to it. You can obtain this using the Azure portal (navigate to the *VDC-NVA* resource group and inspect the object named 'csr-pip'). Alternatively, you can use the Azure CLI to obtain the public IP address, as follows:
+**1)** To log on to the CSR1000V, you'll need to obtain the public IP address assigned to it. You can obtain this using the Azure portal (navigate to the *VDC-NVA* resource group and inspect the object named 'csr-pip'). Alternatively, you can use the Azure CLI to obtain the IP addresses for the virtual machine, as follows:
 
 <pre lang="...">
-<b>az network public-ip list -g VDC-NVA --query [*].[name,ipAddress]</b>
-[
-  [
-    "csr-pip",
-    "52.142.215.217"
-  ]
-]
+<b>az vm list-ip-addresses --resource-group VDC-NVA --output table</b>
+VirtualMachine    PublicIPAddresses    PrivateIPAddresses
+----------------  -------------------  --------------------
+vdc-csr-1         51.144.132.127       10.101.1.4
+vdc-csr-1                              10.101.2.4
  </pre>
- 
+
 **2)** Now that you have the public IP address, SSH to the CSR1000V VM from within the Cloud Shell using 'ssh labuser@_public-ip_'. The username and password for the CSR are *labuser / M1crosoft123*.
 
 **3)** Enter configuration mode on the CSR:
