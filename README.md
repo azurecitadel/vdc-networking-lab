@@ -184,7 +184,7 @@ Now that you are familiar with the overall architecture, let's move on to the ne
 
 In our VDC environment, we have a hub virtual network (used as a central point for control and inspection of ingress / egress traffic between different zones) and a virtual network used to simulate an on-premises environment. In order to provide connectivity between the hub and on-premises, we will configure a site-to-site VPN. The VPN gateways required to achieve this have already been deployed, however they must be configured before traffic will flow. Follow the steps below to configure the site-to-site VPN connection.
 
-**1)** Using the Azure portal, click on 'More Services' on the bottom left of the screen and then search for and select 'Virtual Network Gateways'. Click on the virtual network gateway named 'Hub_GW1'. Select 'Connections'.
+**1)** Using the Azure portal, click on 'All Services' at the top left of the screen and then search for and select 'Virtual Network Gateways'. Click on the virtual network gateway named 'Hub_GW1'. Select 'Connections'.
 
 **2)** Add a connection and name it 'Hub2OnPrem'. Ensure the connection type is 'VNet-to-VNet'.
 
@@ -477,7 +477,7 @@ You might wonder why the third rule denying all traffic is required in this exam
 
 Azure Security Center is a feature built in to Azure which allows administrators to gain visibility into the security of their environment and to detect and respond to issues and threats. In this part of the lab, we'll explore Azure Security Center and what it has to offer.
 
-**1)** In the Azure portal, expand the left hand menu and select 'More Services'. Search for and then select 'Security Center'.
+**1)** In the Azure portal, expand the left hand menu and select 'All Services'. Search for and then select 'Security Center'.
 
 **2)** The overview section of the Security Center shows an 'at-a-glance' view of any security recommendations, alerts and prevention items relating to compute, storage, networking and applications.
 
@@ -623,7 +623,7 @@ In this section, we will explore some of the monitoring options we have in Azure
 
 Before we can use the tools in this section, we must first enable Network Watcher. To do this, follow these steps:
 
-**1)** In the Azure portal, expand the left hand menu and then click *More Services*. In the filter bar, type 'Network Watcher' and then click on the Network Watcher service.
+**1)** In the Azure portal, expand the left hand menu and then click *All Services*. In the filter bar, type 'Network Watcher' and then click on the Network Watcher service.
 
 **2)** You should see your Azure subscription listed in the right hand pane - find your region and then click on the'...' on the right hand side. Click 'Enable Network Watcher':
 
@@ -654,7 +654,7 @@ Network Security Group (NSG) Flow Logs are a feature of Network Watcher that all
 az storage account create --name storage-account-name -g VDC-Hub --sku Standard_LRS
 </pre>
 
-**2)** Use the Azure portal to navigate to the Network Watcher section (expand left menu, select 'More Services' and search for 'Network Watcher'). Select 'NSG Flow Logs' from the Network Watcher menu. Filter using your subscription and Resource Group at the top of the page and you should see the NSG we created in the earlier lab.
+**2)** Use the Azure portal to navigate to the Network Watcher section (expand left menu, select 'All Services' and search for 'Network Watcher'). Select 'NSG Flow Logs' from the Network Watcher menu. Filter using your subscription and Resource Group at the top of the page and you should see the NSG we created in the earlier lab.
 
 **3)** Click on the NSG and then in the settings screen, change the status to 'On'. Select the storage account you created in step 1 and change the retention to 5 days. Click 'Save'.
 
@@ -722,7 +722,7 @@ Another useful feature of Network Watcher is the ability to trace the next hop f
 
 Azure Monitor is a tool that provides central monitoring of most Azure services, designed to give you infrastructure level diagnostics about a service and the surrounding environment. In this section of the lab, we will use Azure Monitor to look at metrics on a resource and create an alert to receive an email when a CPU threshold is crossed.
 
-**1)** Start by using the Azure portal to navigate to the Azure Monitor view by expanding the left hand main menu and selecting 'Monitor'. If it is not shown, select 'More Services' and search for it. Select 'Activity Log' from the left hand menu. This shows a filterable view of all activity in your subscription - you can filter based on timespan, event severity, resource type and operation. Modify some of the filter fields in this screen to narrow down the search criteria.
+**1)** Start by using the Azure portal to navigate to the Azure Monitor view by expanding the left hand main menu and selecting 'Monitor'. If it is not shown, select 'All Services' and search for it. Select 'Activity Log' from the left hand menu. This shows a filterable view of all activity in your subscription - you can filter based on timespan, event severity, resource type and operation. Modify some of the filter fields in this screen to narrow down the search criteria.
 
 ![Azure Monitor Activity Log](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/AzMon1.jpg "Azure Monitor Activity Log")
 
@@ -791,7 +791,7 @@ We'll start by configuring a number of users and groups.
 
 ## 5.1: Configure Users and Groups <a name="usersgroups"></a>
 
-**1)** To begin, we'll verify our domain name in the Azure portal. On the left hand side of the portal screen, click 'More Services' and then search for 'Azure Active Directory'. Click on 'Domain Name' and you will see the domain assigned to your Azure AD directory.
+**1)** To begin, we'll verify our domain name in the Azure portal. On the left hand side of the portal screen, click 'All Services' and then search for 'Azure Active Directory'. Click on 'Domain Name' and you will see the domain assigned to your Azure AD directory.
 
 ![AAD Domain Name](https://github.com/azurecitadel/vdc-networking-lab/blob/master/images/DomainName.jpg "AAD Domain Name")
 
