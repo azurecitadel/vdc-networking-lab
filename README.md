@@ -267,7 +267,7 @@ GigabitEthernet2       10.101.2.4      YES DHCP   up                    up
 **6)** Exit the SSH session to the Cisco CSR and then find the public IP address of the virtual machine named *OnPrem_VM1* using the following command:
 
 <pre lang="...">
-az network public-ip list -g VDC-OnPrem --query [*].[name,ipAddress]
+az vm list-ip-addresses --name OnPrem-VM1 --resource-group VDC-OnPrem --output table
 </pre>
 
 **7)** SSH to the public IP of OnPrem_VM1. From within the VM, attempt to connect to the private IP address of one of the CSR1000V interfaces (10.101.1.4):
