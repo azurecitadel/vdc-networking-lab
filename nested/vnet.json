@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnet": {
+            "type": "object",
+            "defaultValue": {
+                "name": "OnPrem_Vnet",
+                "addressPrefixes": [ "10.102.0.0/16" ],
+                "subnets": [
+                    { "addressPrefix": "10.102.1.0/24", "name": "OnPrem_Vnet_Subnet1" },
+                    { "addressPrefix": "10.102.2.0/24", "name": "OnPrem_Vnet_Subnet2" },
+                    { "addressPrefix": "10.102.3.0/24", "name": "GatewaySubnet" }
+                ]
+            },
+            "metadata": {
+                "description": "Object containing information for the vNet.  See defaultValue for expected structure."
+            }
+        }
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('vnet').name)]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('vnet').addressPrefixes]"
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('vnet').subnets)]",
+                        "input": {
+                            "name": "[parameters('vnet').subnets[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('vnet').subnets[copyIndex('subnets')].addressPrefix]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
