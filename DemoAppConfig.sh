@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash - now in LF
 
 echo "Patching OS"
 sudo apt-get update --quiet
