@@ -23,7 +23,7 @@
             "type": "securestring"
         },
         "script": {
-            "defaultValue": "test.sh",
+            "defaultValue": "DemoAppConfig.sh",
             "type": "string",
             "metadata": {
                 "description": "Script extension to conditionally run.  Assumed to be in same URI location as the current template."
@@ -130,6 +130,7 @@
         },
         {
             "condition": "[not(empty(parameters('script')))]",
+            "comments": "Script, stdout and stderr will be output to /var/lib/waagent/custom-script/download/.  Use sudo to access.",
             "name": "[concat(parameters('vmName'), '/', parameters('script'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-12-01",
