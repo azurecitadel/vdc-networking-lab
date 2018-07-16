@@ -152,7 +152,7 @@
         {
             "condition": "[not(empty(parameters('script')))]",
             "comments": "Script, stdout and stderr will be output to /var/lib/waagent/custom-script/download/.  Use sudo to access.",
-            "name": "[concat(parameters('vmName'), '/', parameters('script'))]",
+            "name": "[concat(parameters('vmName'), '/script-', parameters('script'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-12-01",
             "location": "[resourceGroup().location]",
