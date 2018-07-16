@@ -1,0 +1,278 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rgPrefix": {
+           "type": "string",
+           "defaultValue": "DEV-",
+           "metadata": {
+                "description": "Prefix for the resource group names"
+            }
+        },
+        "createVPNGateway": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "Controls whether VPN gateways will be deployed"
+            }
+        }
+    },
+    "variables": {
+        "vnetUri": "[uri(deployment().properties.templateLink.uri, 'nested/vnet.json')]",
+        "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
+        "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
+        "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]"
+    },
+    "resources": [
+        {
+            "comments": "Create Hub vNet",
+            "name": "Deploy-Hub-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "vnet": {
+                    "value": {
+                        "name": "Hub-vnet",
+                        "addressPrefixes": [  "10.101.0.0/16" ],
+                        "subnets": [ 
+                            { "addressPrefix": "10.101.0.0/24", "name": "GatewaySubnet" },
+                            { "addressPrefix": "10.101.1.0/24", "name": "Hub-vnet-subnet1" },
+                            { "addressPrefix": "10.101.2.0/24", "name": "Hub-vnet-subnet2" }
+                        ]
+                    }
+                }
+            }
+        },        
+        {
+            "comments": "Create OnPrem vNet",
+            "name": "Deploy-OnPrem-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "vnet": {
+                    "value": {
+                        "name": "OnPrem-vnet",
+                        "addressPrefixes": [  "10.101.0.0/16" ],
+                        "subnets": [ 
+                            { "addressPrefix": "10.102.0.0/24", "name": "GatewaySubnet" },
+                            { "addressPrefix": "10.102.1.0/24", "name": "OnPrem-vnet-subnet1" },
+                            { "addressPrefix": "10.102.2.0/24", "name": "OnPrem-vnet-subnet2" }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Create Spoke1 vNet",
+            "name": "Deploy-Spoke1-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "vnet": {
+                    "value": {
+                        "name": "Spoke1-vnet",
+                        "addressPrefixes": [  "10.1.0.0/16" ],
+                        "subnets": [ 
+                            { "addressPrefix": "10.1.1.0/24", "name": "Spoke1-vnet-subnet1" },
+                            { "addressPrefix": "10.1.2.0/24", "name": "Spoke1-vnet-subnet2" }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Create Spoke2 vNet",
+            "name": "Deploy-Spoke2-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "vnet": {
+                    "value": {
+                        "name": "Spoke2-vnet",
+                        "addressPrefixes": [  "10.2.0.0/16" ],
+                        "subnets": [ 
+                            { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
+                            { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Create NVA vNet",
+            "name": "Deploy-NVA-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'NVA')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "vnet": {
+                    "value": {
+                        "name": "NVA-vnet",
+                        "addressPrefixes": [  "10.2.0.0/16" ],
+                        "subnets": [ 
+                            { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
+                            { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Create VPN Gateway in Hub-vnet",
+            "name": "Deploy-Hub_vpnGateway",
+            "condition": "[parameters('createVPNGateway')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vpnGwUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vnetName": {
+                        "value": "Hub-vnet"
+                    },
+                    "vpnGwName": {
+                        "value": "Hub-vpn-gw"
+                    }
+                }
+            },
+            "dependsOn": [
+                "Deploy-Hub-vNet"
+            ]
+        },
+        {
+            "comments": "Create VPN Gateway in OnPrem-vnet",
+            "name": "Deploy-OnPrem_vpnGateway",
+            "condition": "[parameters('createVPNGateway')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vpnGwUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vnetName": {
+                        "value": "OnPrem-vnet"
+                    },
+                    "vpnGwName": {
+                        "value": "OnPrem-vpn-gw"
+                    }
+                }
+            },
+            "dependsOn": [
+                "Deploy-OnPrem-vNet"
+            ]
+        },
+        {
+            "comments": "Create two VMs in an availability set with load balancing in Spoke 1 VNet",
+            "name": "Deploy-Spoke1-VMs",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('avsetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vNetName": {
+                        "value": "Spoke1-vnet"
+                    },
+                    "subnetName": {
+                        "value": "Spoke1-vnet-subnet1"
+                    },
+                    "prefix": {
+                        "value": "Spoke1"
+                    }
+                }
+            },
+            "dependsOn": [
+                "Deploy-Spoke1-vNet"
+            ]
+        },
+        {
+            "comments": "Create two VMs in an availability set with load balancing in Spoke 2 VNet",
+            "name": "Deploy-Spoke2-VMs",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('avsetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vNetName": {
+                        "value": "Spoke2-vnet"
+                    },
+                    "subnetName": {
+                        "value": "Spoke2-vnet-subnet1"
+                    },
+                    "prefix": {
+                        "value": "Spoke2"
+                    }
+                }
+            },
+            "dependsOn": [
+                "Deploy-Spoke2-vNet"
+            ]
+        },
+        {
+            "comments": "Create single VM in the on-premises vNet",
+            "name": "Deploy-OnPrem-VM",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    
+                }
+            },
+            "dependsOn": [
+                "Deploy-OnPrem-vNet"
+            ]
+        }
+    ]
+}
