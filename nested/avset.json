@@ -3,18 +3,18 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vNetName": {
-            "defaultValue": "OnPrem_Vnet",
+            "defaultValue": "Spoke1_Vnet",
             "type": "string"
         },
         "subnetName": {
-            "defaultValue": "Subnet",
+            "defaultValue": "Spoke1_Vnet_Subnet1",
             "type": "string"
         },
         "prefix": {
-            "defaultValue": "testname",
+            "defaultValue": "Spoke1",
             "type": "string",
             "metadata": {
-                "description": "prefix to be used for all resources created by this "
+                "description": "Prefix to be used for all resource names created by this template"
             }
         },
         "vmCount": {
