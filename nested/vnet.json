@@ -5,18 +5,34 @@
         "vnet": {
             "type": "object",
             "defaultValue": {
-                "name": "Spoke1_Vnet",
-                "addressPrefixes": [ "10.1.0.0/16" ],
+                "name": "OnPrem_Vnet",
+                "addressPrefixes": [
+                    "10.102.0.0/16"
+                ],
                 "subnets": [
-                    { "addressPrefix": "10.1.1.0/24", "name": "Spoke1_Vnet_Subnet1" },
-                    { "addressPrefix": "10.1.2.0/24", "name": "Spoke1_Vnet_Subnet2" },
-                    { "addressPrefix": "10.1.3.0/24", "name": "GatewaySubnet" }
-                ]
+                    {
+                        "addressPrefix": "10.102.1.0/24",
+                        "name": "OnPrem_Vnet_Subnet1"
+                    },
+                    {
+                        "addressPrefix": "10.102.2.0/24",
+                        "name": "OnPrem_Vnet_Subnet2"
+                    },
+                    {
+                        "addressPrefix": "10.102.3.0/24",
+                        "name": "GatewaySubnet"
+                    }
+                ],
+                "vpnGwName": "OnPrem-gw"
             },
             "metadata": {
-                "description": "Object containing information for the vNet.  See defaultValue for expected structure."
+                "description": "Object containing information for the vNet.  See defaultValue for expected structure. VPN Gateway only created if name specified"
             }
         }
+    },
+    "variables": {
+        "vpnGwPipName": "[concat(parameters('vnet').vpnGwName, '-pip')]",
+        "asNumber": 65515
     },
     "resources": [
         {
@@ -40,6 +56,56 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "comments": "Create public IP address for VPN Gateway",
+            "condition": "[not(empty(parameters('vnet').vpnGwName))]",
+            "name": "[variables('vpnGwPipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "comments": "Create a VPN gateway",
+            "condition": "[not(empty(parameters('vnet').vpnGwName))]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2017-10-01",
+            "name": "[parameters('vnet').vpnGwName]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[variables('vpnGwPipName')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(resourceID('Microsoft.Network/virtualNetworks', parameters('vnet').name), '/subnets/', 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vpnGwPipName'))]"
+                            }
+                        },
+                        "name": "[concat(parameters('vnet').name, 'vnetGwConfig')]"
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "sku": {
+                    "name": "VpnGw1",
+                    "tier": "VpnGw1",
+                    "capacity": 2
+                },
+                "gatewaySize": "Default",
+                "vpnType": "RouteBased",
+                "enableBgp": "true",
+                "bgpSettings": {
+                    "asn": "[variables('asNumber')]"
+                }
             }
         }
     ]
