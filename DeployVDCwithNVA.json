@@ -67,7 +67,7 @@
                     "vnet": {
                         "value": {
                             "name": "OnPrem-vnet",
-                            "addressPrefixes": [  "10.101.0.0/16" ],
+                            "addressPrefixes": [  "10.102.0.0/16" ],
                             "subnets": [ 
                                 { "addressPrefix": "10.102.0.0/24", "name": "GatewaySubnet" },
                                 { "addressPrefix": "10.102.1.0/24", "name": "OnPrem-vnet-subnet1" },
@@ -120,32 +120,6 @@
                     "vnet": {
                         "value": {
                             "name": "Spoke2-vnet",
-                            "addressPrefixes": [  "10.2.0.0/16" ],
-                            "subnets": [ 
-                                { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
-                                { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "comments": "Create NVA vNet",
-            "name": "Deploy-NVA-vNet",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'NVA')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('vnetUri')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "vnet": {
-                        "value": {
-                            "name": "NVA-vnet",
                             "addressPrefixes": [  "10.2.0.0/16" ],
                             "subnets": [ 
                                 { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
