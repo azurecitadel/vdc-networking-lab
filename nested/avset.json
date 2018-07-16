@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vNetName": {
-            "defaultValue": "Spoke1_Vnet",
+            "defaultValue": "Spoke1-vnet",
             "type": "string"
         },
         "subnetName": {
-            "defaultValue": "Spoke1_Vnet_Subnet1",
+            "defaultValue": "Spoke1-vnet-subnet1",
             "type": "string"
         },
         "prefix": {
@@ -139,7 +139,7 @@
                         "value": "[parameters('subnetName')]"
                     },
                     "vmName": {
-                        "value": "[concat(parameters('prefix'), '-VM', copyIndex(1))]"
+                        "value": "[concat(parameters('prefix'), '-vm', copyIndex(1))]"
                     },
                     "script": {
                         "value": "[variables('script')]"
