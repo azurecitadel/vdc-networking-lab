@@ -267,7 +267,18 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    
+                    "vNetName": {
+                        "value": "OnPrem-vnet"
+                    },
+                    "subnetName": {
+                        "value": "OnPrem-vnet-subnet1"
+                    },
+                    "vmName": {
+                        "value": "OnPrem-vm"
+                    },
+                    "pip?": {
+                        "value": true
+                    }
                 }
             },
             "dependsOn": [
