@@ -42,8 +42,7 @@
                 "platformUpdateDomainCount": 2
             },
             "sku": {
-                "name": "Aligned",
-                "tier": "Standard"
+                "name": "Aligned"
             }
         },
         {
