@@ -6,23 +6,22 @@
             "type": "string",
             "defaultValue": "OnPrem_Vnet"
         },
-        "prefix": {
+        "vpnGwName": {
             "type": "string",
-            "defaultValue": "OnPrem",
+            "defaultValue": "OnPrem-gw",
             "metadata": {
                 "description": "Prefix for all resource naming."
             }
         }
     },
     "variables": {
-        "gwName": "[concat(parameters('prefix'), '-gw')]",
-        "gwPipName": "[concat(parameters('prefix'), '-gw-pip')]",
+        "vpnGwPipName": "[concat(parameters('vpnGwName'), '-pip')]",
         "asNumber": 65515
     },
     "resources": [
         {
             "comments": "Create public IP address for VPN Gateway",
-            "name": "[variables('gwPipName')]",
+            "name": "[variables('vpnGwPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
@@ -34,10 +33,10 @@
             "comments": "Create a VPN gateway",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2017-10-01",
-            "name": "[variables('gwName')]",
+            "name": "[parameters('vpnGwName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[variables('gwPipName')]"
+                "[variables('vpnGwPipName')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -48,7 +47,7 @@
                                 "id": "[concat(resourceID('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', 'GatewaySubnet')]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gwPipName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vpnGwPipName'))]"
                             }
                         },
                         "name": "[concat(parameters('vnetName'), 'vnetGwConfig')]"
