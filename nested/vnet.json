@@ -5,12 +5,12 @@
         "vnet": {
             "type": "object",
             "defaultValue": {
-                "name": "OnPrem_Vnet",
-                "addressPrefixes": [ "10.102.0.0/16" ],
+                "name": "Spoke1_Vnet",
+                "addressPrefixes": [ "10.1.0.0/16" ],
                 "subnets": [
-                    { "addressPrefix": "10.102.1.0/24", "name": "OnPrem_Vnet_Subnet1" },
-                    { "addressPrefix": "10.102.2.0/24", "name": "OnPrem_Vnet_Subnet2" },
-                    { "addressPrefix": "10.102.3.0/24", "name": "GatewaySubnet" }
+                    { "addressPrefix": "10.1.1.0/24", "name": "Spoke1_Vnet_Subnet1" },
+                    { "addressPrefix": "10.1.2.0/24", "name": "Spoke1_Vnet_Subnet2" },
+                    { "addressPrefix": "10.1.3.0/24", "name": "GatewaySubnet" }
                 ]
             },
             "metadata": {

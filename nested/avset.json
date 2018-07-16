@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vNetName": {
-            "defaultValue": "VNet",
+            "defaultValue": "OnPrem_Vnet",
             "type": "string"
         },
         "subnetName": {
@@ -12,7 +12,10 @@
         },
         "prefix": {
             "defaultValue": "testname",
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "prefix to be used for all resources created by this "
+            }
         },
         "vmCount": {
             "defaultValue": 2,
@@ -22,9 +25,9 @@
     "variables": {
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vNetName'))]",
         "subnetId": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
-        "avsetName": "[concat(parameters('prefix'), '-avset')]",
-        "lbName": "[concat(parameters('prefix'), '-lb')]",
-        "lbPipName": "[concat(parameters('prefix'), '-lb-pip')]",
+        "avsetName": "[concat(parameters('prefix'), '-AvailabilitySet')]",
+        "lbName": "[concat(parameters('prefix'), '-LB')]",
+        "lbPipName": "[concat(parameters('prefix'), '-LB-PIP')]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'vm.json')]",
         "script": "DemoAppConfig.sh"
     },
