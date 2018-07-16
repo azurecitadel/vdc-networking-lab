@@ -8,9 +8,9 @@
         },
         "vpnGwName": {
             "type": "string",
-            "defaultValue": "OnPrem-gw",
+            "defaultValue": "vpn-gw",
             "metadata": {
-                "description": "Prefix for all resource naming."
+                "description": "Name for the VPN Gateway."
             }
         }
     },
