@@ -35,8 +35,8 @@
             "apiVersion": "2017-12-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "platformFaultDomainCount": 5,
-                "platformUpdateDomainCount": 2,
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 5,
                 "virtualMachines": []
             },
             "sku": {
