@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "OnPrem_Vnet"
+        },
+        "prefix": {
+            "type": "string",
+            "defaultValue": "OnPrem",
+            "metadata": {
+                "description": "Prefix for all resource naming."
+            }
+        }
+    },
+    "variables": {
+        "gwName": "[concat(parameters('prefix'), '-gw')]",
+        "gwPipName": "[concat(parameters('prefix'), '-gw-pip')]",
+        "asNumber": 65515
+    },
+    "resources": [
+        {
+            "comments": "Create public IP address for VPN Gateway",
+            "name": "[variables('gwPipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "comments": "Create a VPN gateway",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2017-10-01",
+            "name": "[variables('gwName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[variables('gwPipName')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(resourceID('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gwPipName'))]"
+                            }
+                        },
+                        "name": "[concat(parameters('vnetName'), 'vnetGwConfig')]"
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "sku": {
+                    "name": "VpnGw1",
+                    "tier": "VpnGw1",
+                    "capacity": 2
+                },
+                "gatewaySize": "Default",
+                "vpnType": "RouteBased",
+                "enableBgp": "true",
+                "bgpSettings": {
+                    "asn": "[variables('asNumber')]"
+                }
+            }
+        }
+    ]
+}
