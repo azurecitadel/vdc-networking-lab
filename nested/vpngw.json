@@ -3,12 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetName": {
-            "type": "string",
-            "defaultValue": "OnPrem_Vnet"
+            "type": "string"
         },
         "vpnGwName": {
             "type": "string",
-            "defaultValue": "vpn-gw",
             "metadata": {
                 "description": "Name for the VPN Gateway."
             }

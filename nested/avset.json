@@ -3,15 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vNetName": {
-            "defaultValue": "Spoke1-vnet",
             "type": "string"
         },
         "subnetName": {
-            "defaultValue": "Spoke1-vnet-subnet1",
             "type": "string"
         },
         "prefix": {
-            "defaultValue": "Spoke1",
             "type": "string",
             "metadata": {
                 "description": "Prefix to be used for all resource names created by this template"

@@ -5,18 +5,18 @@
         "vnet": {
             "type": "object",
             "defaultValue": {
-                "name": "OnPrem-vnet",
+                "name": "Example-vnet",
                 "addressPrefixes": [
                     "10.102.0.0/16"
                 ],
                 "subnets": [
                     {
                         "addressPrefix": "10.102.1.0/24",
-                        "name": "OnPrem-vnet-subnet1"
+                        "name": "Example-vnet-subnet1"
                     },
                     {
                         "addressPrefix": "10.102.2.0/24",
-                        "name": "OnPrem-vnet-subnet2"
+                        "name": "Example-vnet-subnet2"
                     },
                     {
                         "addressPrefix": "10.102.3.0/24",
