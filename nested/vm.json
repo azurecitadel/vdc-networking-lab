@@ -3,15 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetName": {
-            "defaultValue": "OnPrem_Vnet",
             "type": "string"
         },
         "subnetName": {
-            "defaultValue": "OnPrem_Vnet_Subnet1",
             "type": "string"
         },
         "vmName": {
-            "defaultValue": "OnPrem-VM1",
             "type": "string"
         },
         "adminUsername": {
@@ -23,7 +20,7 @@
             "type": "securestring"
         },
         "script": {
-            "defaultValue": "DemoAppConfig.sh",
+            "defaultValue": "",
             "type": "string",
             "metadata": {
                 "description": "Script extension to conditionally run.  Assumed to be in same URI location as the current template."
@@ -34,6 +31,20 @@
             "type": "bool",
             "metadata": {
                 "description": "Boolean to control creation of public IP address"
+            }
+        },
+        "avsetName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the availability set to join.  Set to empty string if not required."
+            }
+        },
+        "lbName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the load balancer to join. Set to empty string if not required."
             }
         }
     },
@@ -48,6 +59,14 @@
         "pipObject": {
             "id": "[variables('pipId')]"
         },
+        "avsetObject": {
+            "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('avsetName'))]"
+        },
+        "lbpoolArray": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/backendAddressPools/BackendPool')]"
+            }
+        ],
         "scriptUri": "[uri(deployment().properties.templateLink.uri, parameters('script'))]"
     },
     "resources": [
@@ -79,6 +98,7 @@
                             "subnet": {
                                 "id": "[variables('subnetId')]"
                             },
+                            "loadBalancerBackendAddressPools": "[if( empty(parameters('lbName')), json('null'), variables('lbpoolArray'))]",
                             "publicIPAddress": "[if(parameters('pip?'), variables('pipObject'), json('null'))]"
                         }
                     }
@@ -125,7 +145,8 @@
                     "bootDiagnostics": {
                         "enabled": false
                     }
-                }
+                },
+                "availabilitySet": "[if(empty(parameters('avsetName')), json('null'), variables('avsetObject'))]"
             }
         },
         {
@@ -136,20 +157,20 @@
             "apiVersion": "2017-12-01",
             "location": "[resourceGroup().location]",
             "properties": {
-              "publisher": "Microsoft.Azure.Extensions",
-              "type": "CustomScript",
-              "typeHandlerVersion": "2.0",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "fileUris": [
-                  "[variables('scriptUri')]"
-                ],
-                "commandToExecute": "[concat('/bin/bash -x ', parameters('script'))]"
-              }
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[variables('scriptUri')]"
+                    ],
+                    "commandToExecute": "[concat('/bin/bash -x ', parameters('script'))]"
+                }
             },
             "dependsOn": [
-              "[parameters('vmName')]"
+                "[parameters('vmName')]"
             ]
-          }
+        }
     ]
 }
