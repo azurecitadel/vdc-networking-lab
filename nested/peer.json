@@ -38,10 +38,6 @@
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId(parameters('spokes')[copyIndex()].resourceGroup, 'Microsoft.Network/virtualNetworks/', parameters('spokes')[copyIndex()].name)]",
-                "[variables('hubID')]"
-            ],
             "properties": {
                 "allowVirtualNetworkAccess": true,
                 "allowForwardedTraffic": false,
@@ -63,10 +59,6 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[parameters('spokes')[copyIndex()].resourceGroup]",
-            "dependsOn": [
-                "[resourceId(parameters('spokes')[copyIndex()].resourceGroup, 'Microsoft.Network/virtualNetworks/', parameters('spokes')[copyIndex()].name)]",
-                "[variables('hubID')]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "template": {

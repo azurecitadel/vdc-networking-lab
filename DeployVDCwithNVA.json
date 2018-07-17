@@ -160,7 +160,12 @@
                         ]
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "Deploy-Hub-vNet",
+                "Deploy-Spoke1-vNet",
+                "Deploy-Spoke2-vNet"               
+            ]
         },
         {
             "comments": "Create VPN Gateway in Hub-vnet",
