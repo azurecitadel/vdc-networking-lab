@@ -21,6 +21,7 @@
         "vnetUri": "[uri(deployment().properties.templateLink.uri, 'nested/vnet.json')]",
         "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
         "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
+        "peerUri": "[uri(deployment().properties.templateLink.uri, 'nested/peer.json')]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]"
     },
     "resources": [
@@ -131,8 +132,39 @@
             }
         },
         {
+            "name": "Create-vNetPeerings",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('peerUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "hub": {
+                        "value": {
+                            "name": "Hub-vnet"
+                        }
+                    },
+                    "spokes": {
+                        "value": [
+                            {
+                                "name": "Spoke1-vnet",
+                                "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]"
+                            },
+                            {
+                                "name": "Spoke2-vnet",
+                                "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
             "comments": "Create VPN Gateway in Hub-vnet",
-            "name": "Deploy-Hub_vpnGateway",
+            "name": "Deploy-Hub-vpnGateway",
             "condition": "[parameters('createVPNGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
@@ -158,7 +190,7 @@
         },
         {
             "comments": "Create VPN Gateway in OnPrem-vnet",
-            "name": "Deploy-OnPrem_vpnGateway",
+            "name": "Deploy-OnPrem-vpnGateway",
             "condition": "[parameters('createVPNGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
