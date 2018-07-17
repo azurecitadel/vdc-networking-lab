@@ -4,7 +4,7 @@
     "parameters": {
         "rgPrefix": {
            "type": "string",
-           "defaultValue": "DEV-",
+           "defaultValue": "VDC-",
            "metadata": {
                 "description": "Prefix for the resource group names"
             }
