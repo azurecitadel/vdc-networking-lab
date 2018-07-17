@@ -7,20 +7,20 @@
             "defaultValue": {
                 "name": "Example-vnet",
                 "addressPrefixes": [
-                    "10.102.0.0/16"
+                    "10.0.0.0/16"
                 ],
                 "subnets": [
                     {
-                        "addressPrefix": "10.102.1.0/24",
+                        "addressPrefix": "10.0.0.0/24",
+                        "name": "GatewaySubnet"
+                    },
+                    {
+                        "addressPrefix": "10.0.1.0/24",
                         "name": "Example-vnet-subnet1"
                     },
                     {
-                        "addressPrefix": "10.102.2.0/24",
+                        "addressPrefix": "10.0.2.0/24",
                         "name": "Example-vnet-subnet2"
-                    },
-                    {
-                        "addressPrefix": "10.102.3.0/24",
-                        "name": "GatewaySubnet"
                     }
                 ]
             },
