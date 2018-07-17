@@ -5,60 +5,52 @@
         "hub": {
             "type": "object",
             "defaultValue": {
+                "resourceGroup": "hub",
                 "name": "hub"
             },
             "metadata": {
-                "description": "Hub vNet name. Template should be submitted into resource group for the hub vNet."
+                "description": "Object containing hub vNet name and resource group."
             }
         },
-        "spokes": {
-            "type": "array",
-            "defaultValue": [
-                {
-                    "resourceGroup": "spoke1",
-                    "name": "spoke1"
-                },
-                {
-                    "resourceGroup": "spoke2",
-                    "name": "spoke2"
-                }
-            ],
+        "spoke": {
+            "type": "object",
+            "defaultValue": {
+                "name": "spoke1"
+            },
             "metadata": {
-                "description": "Array of spoke objects for the inline vNet peering."
+                "description": "Object containing the spoke vNet name.  Submit into the spoke resource group."
             }
         }
     },
     "variables": {
-        "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('hub').name)]"
+        "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('hub').name)]",
+        "spokeID": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('spoke').name)]"
     },
     "resources": [
         {
-            "comments": "Hub to spoke peerings.  Serial to avoid conflict in hub vNet.",
-            "name": "[concat(parameters('hub').name, '/peered-to-', parameters('spokes')[copyIndex()].name)]",
+            "comments": "Spoke to hub peering",
+            "name": "[concat(parameters('spoke').name, '/peered-to-', parameters('hub').name)]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "allowVirtualNetworkAccess": true,
                 "allowForwardedTraffic": false,
-                "allowGatewayTransit": true,
+                "allowGatewayTransit": false,
                 "useRemoteGateways": false,
                 "remoteVirtualNetwork": {
-                    "id": "[resourceId(parameters('spokes')[copyIndex()].resourceGroup, 'Microsoft.Network/virtualNetworks/', parameters('spokes')[copyIndex()].name)]"
+                    "id": "[variables('hubID')]"
                 }
-            },
-            "copy": {
-                "name": "spokes",
-                "count": "[length(parameters('spokes'))]",
-                "mode": "Serial",
-                "batchSize": 1
             }
         },
         {
-            "name": "[concat('DeployVnetPeering-', parameters('spokes')[copyIndex()].name, '-to-', parameters('hub').name)]",
+            "name": "[concat('DeployVnetPeering-', parameters('hub').name, '-to-', parameters('spoke').name)]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[parameters('spokes')[copyIndex()].resourceGroup]",
+            "resourceGroup": "[parameters('hub').resourceGroup]",
+            "dependsOn": [
+                "[concat(parameters('spoke').name, '/peered-to-', parameters('hub').name)]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -68,24 +60,20 @@
                         {
                             "apiVersion": "2017-10-01",
                             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-                            "name": "[concat(parameters('spokes')[copyIndex()].name, '/peered-to-', parameters('hub').name)]",
+                            "name": "[concat(parameters('hub').name, '/peered-to-', parameters('spoke').name)]",
                             "location": "[resourceGroup().location]",
                             "properties": {
                                 "allowVirtualNetworkAccess": true,
                                 "allowForwardedTraffic": false,
-                                "allowGatewayTransit": false,
+                                "allowGatewayTransit": true,
                                 "useRemoteGateways": false,
                                 "remoteVirtualNetwork": {
-                                    "id": "[variables('hubID')]"
+                                    "id": "[variables('spokeID')]"
                                 }
                             }
                         }
                     ]
                 }
-            },
-            "copy": {
-                "name": "spokes",
-                "count": "[length(parameters('spokes'))]"
             }
         }
     ]

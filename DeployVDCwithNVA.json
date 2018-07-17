@@ -101,6 +101,12 @@
                                 { "addressPrefix": "10.1.2.0/24", "name": "Spoke1-vnet-subnet2" }
                             ]
                         }
+                    },
+                    "hub": {
+                        "value": {
+                            "name": "Hub-vnet",
+                            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]"
+                        }
                     }
                 }
             }
@@ -111,6 +117,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]",
+            "dependsOn": [
+                "Deploy-Spoke1-vNet"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -126,6 +135,12 @@
                                 { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
                                 { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
                             ]
+                        }
+                    },
+                    "hub": {
+                        "value": {
+                            "name": "Hub-vnet",
+                            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]"
                         }
                     }
                 }

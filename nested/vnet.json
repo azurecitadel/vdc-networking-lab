@@ -27,6 +27,13 @@
             "metadata": {
                 "description": "Object containing information for the vNet.  See defaultValue for expected structure."
             }
+        },
+        "hub": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional object for hub for peering.  Run serial. Requires name (of the hub vNet) and resourceGroup"
+            }
         }
     },
     "variables": {},
@@ -52,6 +59,58 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "comments": "Optional vnet to hub peering",
+            "condition": "[not(empty(parameters('hub')))]",
+            "name": "[concat(parameters('vnet').name, '/peered-to-', parameters('hub').name)]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId(parameters('hub').resourceGroup,'Microsoft.Network/virtualNetworks/', parameters('hub').name)]"
+                }
+            }
+        },
+        {
+            "comments": "Inline deployment for reverse peering",
+            "condition": "[not(empty(parameters('hub')))]",
+            "name": "[concat('DeployVnetPeering-', parameters('hub').name, '-to-', parameters('vnet').name)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[parameters('hub').resourceGroup]",
+            "dependsOn": [
+                "[concat(parameters('vnet').name, '/peered-to-', parameters('hub').name)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2017-10-01",
+                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                            "name": "[concat(parameters('hub').name, '/peered-to-', parameters('vnet').name)]",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "allowVirtualNetworkAccess": true,
+                                "allowForwardedTraffic": false,
+                                "allowGatewayTransit": true,
+                                "useRemoteGateways": false,
+                                "remoteVirtualNetwork": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('hub').name)]"
+                                }
+                            }
+                        }
+                    ]
+                }
             }
         }
     ]
