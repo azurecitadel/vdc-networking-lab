@@ -147,42 +147,6 @@
             }
         },
         {
-            "name": "Create-vNetPeerings",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('peerUri')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "hub": {
-                        "value": {
-                            "name": "Hub-vnet"
-                        }
-                    },
-                    "spokes": {
-                        "value": [
-                            {
-                                "name": "Spoke1-vnet",
-                                "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]"
-                            },
-                            {
-                                "name": "Spoke2-vnet",
-                                "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]"
-                            }
-                        ]
-                    }
-                }
-            },
-            "dependsOn": [
-                "Deploy-Hub-vNet",
-                "Deploy-Spoke1-vNet",
-                "Deploy-Spoke2-vNet"               
-            ]
-        },
-        {
             "comments": "Create VPN Gateway in Hub-vnet",
             "name": "Deploy-Hub-vpnGateway",
             "condition": "[parameters('createVPNGateway')]",
