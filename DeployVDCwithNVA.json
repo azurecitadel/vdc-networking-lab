@@ -21,7 +21,6 @@
         "vnetUri": "[uri(deployment().properties.templateLink.uri, 'nested/vnet.json')]",
         "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
         "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
-        "peerUri": "[uri(deployment().properties.templateLink.uri, 'nested/peer.json')]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]"
     },
     "resources": [
