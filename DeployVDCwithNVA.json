@@ -81,7 +81,9 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vnet": "[variables('hub')]"
+                    "vnet": {
+                        "value": "[variables('hub')]"
+                    }
                 }
             }
         },        
@@ -98,7 +100,9 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vnet": "[variables('onprem')]"
+                    "vnet": {
+                        "value": "[variables('onprem')]"
+                    }
                 }
             }
         },
@@ -124,8 +128,12 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "hub": "[variables('hub')]",
-                    "spoke": "[variables('spokes')[copyIndex()]]"
+                    "hub": {
+                        "value": "[variables('hub')]"
+                    },
+                    "spoke": {
+                        "value": "[variables('spokes')[copyIndex()]]"
+                    }
                 }
             }
         },
