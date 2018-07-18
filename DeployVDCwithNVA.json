@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "createVPNGateway": {
-            "defaultValue": true,
+            "defaultValue": false,
             "type": "bool",
             "metadata": {
                 "description": "Controls whether VPN gateways will be deployed"
@@ -108,7 +108,7 @@
         },
         {
             "comments": "Serially loop through spokes array and deploy vNet and two way vNet peer",
-            "name": "[concat('Deploy-Spoke', copyIndex(), '-vNet')]",
+            "name": "[concat('Deploy-Spoke', copyIndex(1), '-vNet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[variables('spokes')[copyIndex()].resourceGroup]",
@@ -196,7 +196,7 @@
             "apiVersion": "2017-05-10",
             "resourceGroup": "[variables('spokes')[copyIndex()].resourceGroup]",
             "dependsOn": [
-                "[concat('Deploy-Spoke', copyIndex(), '-vNet')]"
+                "[concat('Deploy-Spoke', copyIndex(1), '-vNet')]"
             ],
             "copy": {
                 "name": "spokes",
@@ -216,7 +216,7 @@
                         "value": "[variables('spokes')[copyIndex()].subnets[0].name]"
                     },
                     "prefix": {
-                        "value": "[concat('Spoke', copyIndex())]"
+                        "value": "[concat('Spoke', copyIndex(1))]"
                     }
                 }
             }
@@ -238,7 +238,7 @@
                         "value": "[variables('onprem').vnet.name]"
                     },
                     "subnetName": {
-                        "value": "[variables('onprem').subnets[0].name]"
+                        "value": "[variables('onprem').subnets[1].name]"
                     },
                     "vmName": {
                         "value": "OnPrem-vm"
