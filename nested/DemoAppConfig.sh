@@ -11,6 +11,11 @@ echo "Installing aptitude, lynx and moreutils"
 sudo apt-get install --yes aptitude lynx moreutils
 
 date +"%b %d %H:%M:%S"
+echo "Updating the labuser .bashrc for coloured prompts"
+[[ ! -f ~labuser/.bashrc.orig ]] && cp -p ~labuser/.bashrc ~labuser/.bashrc.orig
+curl --silent https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/nested/.bashrc > ~labuser/.bashrc
+
+date +"%b %d %H:%M:%S"
 echo "Running setup script"
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
 
