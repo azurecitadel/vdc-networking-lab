@@ -2,13 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "rgPrefix": {
-           "type": "string",
-           "defaultValue": "VDC-",
-           "metadata": {
-                "description": "Prefix for the resource group names"
-            }
-        },
         "createVPNGateway": {
             "defaultValue": true,
             "type": "bool",
@@ -19,9 +12,60 @@
     },
     "variables": {
         "vnetUri": "[uri(deployment().properties.templateLink.uri, 'nested/vnet.json')]",
+        "spokeUri": "[uri(deployment().properties.templateLink.uri, 'nested/spoke.json')]",
         "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
         "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
-        "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]"
+        "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]",
+        "hub": {
+            "resourceGroup": "VDC-Hub",
+            "vnet": {
+                "name": "Hub-vnet",
+                "addressPrefixes": [  "10.101.0.0/16" ]
+            },
+            "subnets": [ 
+                { "addressPrefix": "10.101.0.0/24", "name": "GatewaySubnet" },
+                { "addressPrefix": "10.101.1.0/24", "name": "Hub-vnet-subnet1" },
+                { "addressPrefix": "10.101.2.0/24", "name": "Hub-vnet-subnet2" }
+            ],
+            "vpnGwName": "Hub-vpn-gw"
+        },
+        "onprem": {
+            "resourceGroup": "VDC-OnPrem",
+            "vnet": {
+                "name": "OnPrem-vnet",
+                "addressPrefixes": [  "10.102.0.0/16" ]
+            },
+            "subnets": [ 
+                { "addressPrefix": "10.102.0.0/24", "name": "GatewaySubnet" },
+                { "addressPrefix": "10.102.1.0/24", "name": "OnPrem-vnet-subnet1" },
+                { "addressPrefix": "10.102.2.0/24", "name": "OnPrem-vnet-subnet2" }
+            ],
+            "vpnGwName": "OnPrem-vpn-gw"
+        },
+        "spokes": [
+            {
+                "resourceGroup": "VDC-Spoke1",
+                "vnet": {
+                    "name": "Spoke1-vnet",
+                    "addressPrefixes": [  "10.1.0.0/16" ]
+                },
+                "subnets": [ 
+                    { "addressPrefix": "10.1.1.0/24", "name": "Spoke1-vnet-subnet1" },
+                    { "addressPrefix": "10.1.2.0/24", "name": "Spoke1-vnet-subnet2" }
+                ]
+            },
+            {
+                "resourceGroup": "VDC-Spoke2",
+                "vnet": {
+                    "name": "Spoke2-vnet",
+                    "addressPrefixes": [  "10.2.0.0/16" ]
+                },
+                "subnets": [ 
+                    { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
+                    { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
+                ]
+            }
+        ]
     },
     "resources": [
         {
@@ -29,7 +73,7 @@
             "name": "Deploy-Hub-vNet",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]",
+            "resourceGroup": "[variables('hub').resourceGroup]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -37,17 +81,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vnet": {
-                        "value": {
-                            "name": "Hub-vnet",
-                            "addressPrefixes": [  "10.101.0.0/16" ],
-                            "subnets": [ 
-                                { "addressPrefix": "10.101.0.0/24", "name": "GatewaySubnet" },
-                                { "addressPrefix": "10.101.1.0/24", "name": "Hub-vnet-subnet1" },
-                                { "addressPrefix": "10.101.2.0/24", "name": "Hub-vnet-subnet2" }
-                            ]
-                        }
-                    }
+                    "vnet": "[variables('hub')]"
                 }
             }
         },        
@@ -56,7 +90,7 @@
             "name": "Deploy-OnPrem-vNet",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "resourceGroup": "[variables('onprem').resourceGroup]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -64,84 +98,34 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vnet": {
-                        "value": {
-                            "name": "OnPrem-vnet",
-                            "addressPrefixes": [  "10.102.0.0/16" ],
-                            "subnets": [ 
-                                { "addressPrefix": "10.102.0.0/24", "name": "GatewaySubnet" },
-                                { "addressPrefix": "10.102.1.0/24", "name": "OnPrem-vnet-subnet1" },
-                                { "addressPrefix": "10.102.2.0/24", "name": "OnPrem-vnet-subnet2" }
-                            ]
-                        }
-                    }
+                    "vnet": "[variables('onprem')]"
                 }
             }
         },
         {
-            "comments": "Create Spoke1 vNet",
-            "name": "Deploy-Spoke1-vNet",
+            "comments": "Serially loop through spokes array and deploy vNet and two way vNet peer",
+            "name": "[concat('Deploy-Spoke', copyIndex(), '-vNet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('vnetUri')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "vnet": {
-                        "value": {
-                            "name": "Spoke1-vnet",
-                            "addressPrefixes": [  "10.1.0.0/16" ],
-                            "subnets": [ 
-                                { "addressPrefix": "10.1.1.0/24", "name": "Spoke1-vnet-subnet1" },
-                                { "addressPrefix": "10.1.2.0/24", "name": "Spoke1-vnet-subnet2" }
-                            ]
-                        }
-                    },
-                    "hub": {
-                        "value": {
-                            "name": "Hub-vnet",
-                            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]"
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "comments": "Create Spoke2 vNet",
-            "name": "Deploy-Spoke2-vNet",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]",
+            "resourceGroup": "[variables('spokes')[copyIndex()].resourceGroup]",
             "dependsOn": [
-                "Deploy-Spoke1-vNet"
+                "Deploy-Hub-vNet"
             ],
+            "copy": {
+                "name": "spokes",
+                "count": "[length(variables('spokes'))]",
+                "mode": "Serial",
+                "batchSize": 1
+            },
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('vnetUri')]",
+                    "uri": "[variables('spokeUri')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vnet": {
-                        "value": {
-                            "name": "Spoke2-vnet",
-                            "addressPrefixes": [  "10.2.0.0/16" ],
-                            "subnets": [ 
-                                { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
-                                { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
-                            ]
-                        }
-                    },
-                    "hub": {
-                        "value": {
-                            "name": "Hub-vnet",
-                            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]"
-                        }
-                    }
+                    "hub": "[variables('hub')]",
+                    "spoke": "[variables('spokes')[copyIndex()]]"
                 }
             }
         },
@@ -151,7 +135,7 @@
             "condition": "[parameters('createVPNGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Hub')]",
+            "resourceGroup": "[variables('hub').resourceGroup]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -160,10 +144,10 @@
                 },
                 "parameters": {
                     "vnetName": {
-                        "value": "Hub-vnet"
+                        "value": "[variables('hub').vnet.name]"
                     },
                     "vpnGwName": {
-                        "value": "Hub-vpn-gw"
+                        "value": "[variables('hub').vpnGwName]"
                     }
                 }
             },
@@ -177,7 +161,7 @@
             "condition": "[parameters('createVPNGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "resourceGroup": "[variables('onprem').resourceGroup]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -186,10 +170,10 @@
                 },
                 "parameters": {
                     "vnetName": {
-                        "value": "OnPrem-vnet"
+                        "value": "[variables('onprem').vnet.name]"
                     },
                     "vpnGwName": {
-                        "value": "OnPrem-vpn-gw"
+                        "value": "[variables('onprem').vpnGwName]"
                     }
                 }
             },
@@ -198,11 +182,18 @@
             ]
         },
         {
-            "comments": "Create two VMs in an availability set with load balancing in Spoke 1 VNet",
+            "comments": "Create two VMs in an availability set with load balancing into first subnet in each spoke",
             "name": "Deploy-Spoke1-VMs",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke1')]",
+            "resourceGroup": "[variables('spokes')[copyIndex()].resourceGroup]",
+            "dependsOn": [
+                "[concat('Deploy-Spoke', copyIndex(), '-vNet')]"
+            ],
+            "copy": {
+                "name": "spokes",
+                "count": "[length(variables('spokes'))]"
+            },
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -211,54 +202,23 @@
                 },
                 "parameters": {
                     "vNetName": {
-                        "value": "Spoke1-vnet"
+                        "value": "[variables('spokes')[copyIndex()].vnet.name]"
                     },
                     "subnetName": {
-                        "value": "Spoke1-vnet-subnet1"
+                        "value": "[variables('spokes')[copyIndex()].subnets[0].name]"
                     },
                     "prefix": {
-                        "value": "Spoke1"
+                        "value": "[concat('Spoke', copyIndex())]"
                     }
                 }
-            },
-            "dependsOn": [
-                "Deploy-Spoke1-vNet"
-            ]
-        },
-        {
-            "comments": "Create two VMs in an availability set with load balancing in Spoke 2 VNet",
-            "name": "Deploy-Spoke2-VMs",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'Spoke2')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('avsetUri')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "vNetName": {
-                        "value": "Spoke2-vnet"
-                    },
-                    "subnetName": {
-                        "value": "Spoke2-vnet-subnet1"
-                    },
-                    "prefix": {
-                        "value": "Spoke2"
-                    }
-                }
-            },
-            "dependsOn": [
-                "Deploy-Spoke2-vNet"
-            ]
+            }
         },
         {
             "comments": "Create single VM in the on-premises vNet",
             "name": "Deploy-OnPrem-VM",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[concat(parameters('rgPrefix'), 'OnPrem')]",
+            "resourceGroup": "[variables('onprem').resourceGroup]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -267,10 +227,10 @@
                 },
                 "parameters": {
                     "vNetName": {
-                        "value": "OnPrem-vnet"
+                        "value": "[variables('onprem').vnet.name]"
                     },
                     "subnetName": {
-                        "value": "OnPrem-vnet-subnet1"
+                        "value": "[variables('onprem').subnets[0].name]"
                     },
                     "vmName": {
                         "value": "OnPrem-vm"
