@@ -105,19 +105,21 @@ for rg in Hub Spoke1 Spoke2 OnPrem NVA; do az group create -l westeurope -n VDC-
 **3)** Once the resource groups have been deployed, you can deploy the main lab environment into these using a set of pre-defined ARM templates. The templates are available at https://github.com/azurecitadel/vdc-networking-lab if you wish to learn more about how the lab is defined. Essentially, a single master template (*VDC-Networking-Master.json*) is used to call a number of other templates, which in turn complete the deployment of virtual networks, virtual machines, load balancers, availability sets and VPN gateways. The templates also deploy a simple Node.js application on the spoke virtual machines. Use the following CLI command to deploy the template:
 
 <pre lang="...">
-az group deployment create --name VDC-Create -g VDC-Hub --template-uri https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/VDC-Networking-Master.json --verbose
+master=https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/DeployVDCwithNVA.json
+az group deployment create --name VDC-Create --resource-group VDC-Hub --template-uri $master --verbose
 </pre>
 
 The template deployment process will take approximately 45 minutes. You can monitor the progress of the deployment from the portal (navigate to the *VDC-Hub* resource group and click on *Deployments* at the top of the Overview blade). Alternatively, the CLI can be used to monitor the template deployment progress as follows:
 
 <pre lang="...">
 <b>az group deployment list -g VDC-Hub -o table</b>
-Name               Timestamp                         State
------------------  --------------------------------  ---------
-hubVnet            2017-08-07T08:02:09.623941+00:00  Succeeded
-Hub-Spoke-Peering  2017-08-07T08:02:23.784459+00:00  Succeeded
-Hub_GW1            2017-08-07T08:27:42.052311+00:00  Succeeded
-VDC-Create         2017-08-07T08:30:02.786296+00:00  Succeeded
+Name                                       Timestamp                         State
+-----------------------------------------  --------------------------------  ---------
+VDC-Create                                 2018-07-18T15:05:08.732943+00:00  Running
+Deploy-Hub-vNet                            2018-07-18T15:05:35.786714+00:00  Succeeded
+DeployVnetPeering-Hub-vnet-to-Spoke1-vnet  2018-07-18T15:06:39.337779+00:00  Succeeded
+DeployVnetPeering-Hub-vnet-to-Spoke2-vnet  2018-07-18T15:07:30.684959+00:00  Succeeded
+Deploy-Hub-vpnGateway                      2018-07-18T15:10:05.043446+00:00  Running
 </pre>
 
 Once the template deployment has succeeded, you can proceed to the deployment of the Cisco CSR1000V, as follows:
