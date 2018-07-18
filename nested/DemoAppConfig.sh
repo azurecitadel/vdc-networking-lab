@@ -7,8 +7,8 @@ sudo apt-get dist-upgrade --quiet --yes
 sudo apt-get autoremove -qq 
 
 date +"%b %d %H:%M:%S"
-echo "Installing aptitude and moreutils"
-sudo apt-get install --yes aptitude
+echo "Installing aptitude, lynx and moreutils"
+sudo apt-get install --yes aptitude lynx moreutils
 
 date +"%b %d %H:%M:%S"
 echo "Running setup script"
