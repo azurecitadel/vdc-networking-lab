@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "createVPNGateway": {
-            "defaultValue": false,
+            "defaultValue": true,
             "type": "bool",
             "metadata": {
                 "description": "Controls whether VPN gateways will be deployed"
