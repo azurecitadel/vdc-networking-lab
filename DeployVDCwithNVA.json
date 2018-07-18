@@ -191,7 +191,7 @@
         },
         {
             "comments": "Create two VMs in an availability set with load balancing into first subnet in each spoke",
-            "name": "Deploy-Spoke1-VMs",
+            "name": "[concat('Deploy-Spoke', copyIndex(1), '-VMs')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[variables('spokes')[copyIndex()].resourceGroup]",
