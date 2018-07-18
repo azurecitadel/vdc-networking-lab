@@ -243,6 +243,9 @@
                     "vmName": {
                         "value": "OnPrem-vm"
                     },
+                    "script": {
+                        "value": "StandardOSUpgrade.sh"
+                    },
                     "pip?": {
                         "value": true
                     }
