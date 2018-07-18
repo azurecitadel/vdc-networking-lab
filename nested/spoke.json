@@ -94,9 +94,6 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[parameters('hub').resourceGroup]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/virtualNetworkPeerings', concat(parameters('spoke').vnet.name, '/peered-to-', parameters('hub').vnet.name))]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "template": {
