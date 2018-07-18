@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "hub": {
+        "vnet": {
             "type": "object",
             "defaultValue": {
                 "vnet": {
@@ -12,18 +12,9 @@
                     ]
                 },
                 "subnets": [
-                    {
-                        "addressPrefix": "10.0.0.0/24",
-                        "name": "GatewaySubnet"
-                    },
-                    {
-                        "addressPrefix": "10.0.1.0/24",
-                        "name": "Example-vnet-subnet1"
-                    },
-                    {
-                        "addressPrefix": "10.0.2.0/24",
-                        "name": "Example-vnet-subnet2"
-                    }
+                    { "addressPrefix": "10.0.0.0/24", "name": "GatewaySubnet" },
+                    { "addressPrefix": "10.0.1.0/24", "name": "Example-vnet-subnet1" },
+                    { "addressPrefix": "10.0.2.0/24", "name": "Example-vnet-subnet2" }
                 ]
             },
             "metadata": {
@@ -33,22 +24,22 @@
     },
     "resources": [
         {
-            "name": "[concat(parameters('hub').vnet.name)]",
+            "name": "[concat(parameters('vnet').vnet.name)]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "addressSpace": {
-                    "addressPrefixes": "[parameters('hub').vnet.addressPrefixes]"
+                    "addressPrefixes": "[parameters('vnet').vnet.addressPrefixes]"
                 },
                 "copy": [
                     {
                         "name": "subnets",
-                        "count": "[length(parameters('hub').subnets)]",
+                        "count": "[length(parameters('vnet').subnets)]",
                         "input": {
-                            "name": "[parameters('hub').subnets[copyIndex('subnets')].name]",
+                            "name": "[parameters('vnet').subnets[copyIndex('subnets')].name]",
                             "properties": {
-                                "addressPrefix": "[parameters('hub').subnets[copyIndex('subnets')].addressPrefix]"
+                                "addressPrefix": "[parameters('vnet').subnets[copyIndex('subnets')].addressPrefix]"
                             }
                         }
                     }
