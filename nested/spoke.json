@@ -85,7 +85,10 @@
                 "remoteVirtualNetwork": {
                     "id": "[resourceId(parameters('hub').resourceGroup,'Microsoft.Network/virtualNetworks/', parameters('hub').vnet.name)]"
                 }
-            }
+            },
+            "dependsOn": [
+                "[concat(parameters('spoke').vnet.name)]"
+            ]
         },
         {
             "comments": "Inline deployment for reverse peering",
@@ -117,7 +120,10 @@
                         }
                     ]
                 }
-            }
+            },
+            "dependsOn": [
+                "[concat(parameters('spoke').vnet.name)]"
+            ]
         }
     ]
 }
