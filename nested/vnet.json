@@ -30,13 +30,15 @@
         },
         "hub": {
             "type": "object",
-            "defaultValue": {},
+            "defaultValue": {
+                "name": "",
+                "resourceGroup": ""
+            },
             "metadata": {
-                "description": "Optional object for hub for peering.  Run serial. Requires name (of the hub vNet) and resourceGroup"
+                "description": "Optional object for hub for peering.  Run multiple peerings in serial to avoid conflicts."
             }
         }
     },
-    "variables": {},
     "resources": [
         {
             "name": "[concat(parameters('vnet').name)]",
@@ -63,7 +65,7 @@
         },
         {
             "comments": "Optional vnet to hub peering",
-            "condition": "[not(empty(parameters('hub')))]",
+            "condition": "[not(empty(parameters('hub').name))]",
             "name": "[concat(parameters('vnet').name, '/peered-to-', parameters('hub').name)]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2017-10-01",
@@ -80,7 +82,7 @@
         },
         {
             "comments": "Inline deployment for reverse peering",
-            "condition": "[not(empty(parameters('hub')))]",
+            "condition": "[not(empty(parameters('hub').name))]",
             "name": "[concat('DeployVnetPeering-', parameters('hub').name, '-to-', parameters('vnet').name)]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
