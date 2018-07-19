@@ -36,9 +36,9 @@ git clone https://github.com/araffe/nodejs-demoapp.git
 cd nodejs-demoapp/
 
 date +"%b %d %H:%M:%S"
-echo "Installing forever"
-sudo npm install forever -g &>/dev/null
-sudo npm install &>/dev/null
+echo "Installing forever - not under sudo"
+whoami
+npm install forever -g 
 forever --version
 
 date +"%b %d %H:%M:%S"
