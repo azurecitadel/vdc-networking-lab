@@ -190,7 +190,7 @@
                     "osDisk": {
                         "name": "csr-os",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/osdisk', uniqueString(deployment().name), '.vhd')]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/csr-os-disk.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
