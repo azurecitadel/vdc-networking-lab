@@ -16,7 +16,7 @@
         "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
         "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]",
-        "csrUri": "[uri(deployment().properties.templateLink.uri, 'nested/cisoCSR.json')]",
+        "csrUri": "[uri(deployment().properties.templateLink.uri, 'nested/ciscoCSR.json')]",
         "hub": {
             "resourceGroup": "VDC-Hub",
             "vnet": {
