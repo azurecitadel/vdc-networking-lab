@@ -1,0 +1,12 @@
+[Unit]
+Description=nodejs-demoapp
+After=network.target
+
+[Service]
+User=labuser
+Environment=
+WorkingDirectory=/home/luke/nodejs-demoapp
+ExecStart=/usr/bin/node ./bin/www
+
+[Install]
+WantedBy=multi-user.target
