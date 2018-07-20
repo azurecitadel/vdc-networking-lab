@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=labuser
 Environment=
-WorkingDirectory=/home/luke/nodejs-demoapp
+WorkingDirectory=/home/labuser/nodejs-demoapp
 ExecStart=/usr/bin/node ./bin/www
 Restart=always
 RestartSec=500ms
