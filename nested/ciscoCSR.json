@@ -29,13 +29,13 @@
         "storageAccountName": "[concat('csrstgacct', uniqueString(resourceGroup().id))]",
         "vnetID": "[resourceId(parameters('vNetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vNetName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/Hub-vnet-subnet1')]",
-        "subnet2Ref": "[concat(variables('vnetID'),'/subnets/Hub-vnet-subnet2')]",
+        "subnet2Ref": "[concat(variables('vnetID'),'/subnets/Hub-vnet-subnet2')]"
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageAccountName')]",
-            "apiVersion": "2016-01-01",
+            "apiVersion": "2017-06-01",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Standard_LRS"
@@ -162,7 +162,7 @@
             "name": "csr",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "16_6",
+                "name": "csr-azure-byol",
                 "publisher": "cisco",
                 "product": "cisco-csr-1000v"
             },
@@ -190,7 +190,7 @@
                     "osDisk": {
                         "name": "csr-os",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/osdisk.vhd')]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/osdisk', uniqueString(deployment().name), '.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -220,4 +220,6 @@
                 }
             }
      
+}
+    ]
 }
