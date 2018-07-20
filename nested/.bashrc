@@ -120,3 +120,9 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+## User settings
+
+set -o vi
+alias customscript='(sudo cat /var/lib/waagent/custom-script/download/0/stdout; \
+                     sudo cat /var/lib/waagent/custom-script/download/0/stderr >&2)'
