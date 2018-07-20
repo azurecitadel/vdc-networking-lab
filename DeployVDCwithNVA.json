@@ -16,6 +16,7 @@
         "avsetUri": "[uri(deployment().properties.templateLink.uri, 'nested/avset.json')]",
         "vpngwUri": "[uri(deployment().properties.templateLink.uri, 'nested/vpngw.json')]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'nested/vm.json')]",
+        "csrUri": "[uri(deployment().properties.templateLink.uri, 'nested/cisoCSR.json')]",
         "hub": {
             "resourceGroup": "VDC-Hub",
             "vnet": {
@@ -65,7 +66,10 @@
                     { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
                 ]
             }
-        ]
+        ],
+        "nva": {
+            "resourceGroup": "VDC-NVA"
+        }
     },
     "resources": [
         {
@@ -253,6 +257,24 @@
             },
             "dependsOn": [
                 "Deploy-OnPrem-vNet"
+            ]
+        },
+        {
+            "comments": "Create Cisco CSR 1000v in the NVA vNet",
+            "name": "Deploy-Cisco-CSR-1000v",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[variables('nva').resourceGroup]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('csrUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            },
+            "dependsOn": [
+                "Deploy-Hub-vNet"
             ]
         }
     ]
