@@ -7,6 +7,9 @@ User=labuser
 Environment=
 WorkingDirectory=/home/luke/nodejs-demoapp
 ExecStart=/usr/bin/node ./bin/www
+Restart=always
+RestartSec=500ms
+StartLimitInterval=0
 
 [Install]
 WantedBy=multi-user.target
