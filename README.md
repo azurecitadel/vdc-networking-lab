@@ -105,7 +105,7 @@ for rg in Hub Spoke1 Spoke2 OnPrem NVA; do az group create -l westeurope -n VDC-
 **3)** Once the resource groups have been deployed, you can deploy the main lab environment into these using a set of pre-defined ARM templates. The templates are available at https://github.com/azurecitadel/vdc-networking-lab if you wish to learn more about how the lab is defined. Essentially, a single master template (*VDC-Networking-Master.json*) is used to call a number of other templates, which in turn complete the deployment of virtual networks, virtual machines, load balancers, availability sets and VPN gateways. The templates also deploy a simple Node.js application on the spoke virtual machines. Use the following CLI command to deploy the template:
 
 <pre lang="...">
-master=https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/DeployVDCwithNVA.json
+master=https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/VDC-Networking-Master.json
 az group deployment create --name VDC-Create --resource-group VDC-Hub --template-uri $master --verbose
 </pre>
 
