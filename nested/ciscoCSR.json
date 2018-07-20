@@ -162,7 +162,7 @@
             "name": "csr",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "csr-azure-byol",
+                "name": "16_6",
                 "publisher": "cisco",
                 "product": "cisco-csr-1000v"
             },
