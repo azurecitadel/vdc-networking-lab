@@ -33,19 +33,21 @@ echo "Installing git and cloning the app"
 sudo aptitude install git --quiet --assume-yes
 
 date +"%b %d %H:%M:%S"
-whoami
-pwd
 echo "Cloning the app"
-git clone https://github.com/araffe/nodejs-demoapp.git ~labuser
+git clone https://github.com/araffe/nodejs-demoapp.git ~labuser/nodejs-demoapp
+# git clone https://github.com/benc-uk/nodejs-demoapp.git ~labuser/nodejs-demoapp
 cd ~labuser/nodejs-demoapp/
 
 date +"%b %d %H:%M:%S"
-echo "Installing forever - not under sudo"
-whoami
-npm install forever -g 
-npm install
-forever --version
+echo "Installing forever"
+sudo -H /usr/bin/npm install forever -g --silent 2>/dev/null
+/usr/bin/npm install --silent 2>/dev/null
+which /usr/bin/forever
+/usr/bin/forever --version
 
 date +"%b %d %H:%M:%S"
 echo "Run the app"
-forever start ./bin/www
+/usr/bin/forever start ~labuser/nodejs-demoapp/bin/www 
+# /usr/bin/forever start ~labuser/nodejs-demoapp/
+
+/usr/bin/curl http://localhost:3000
