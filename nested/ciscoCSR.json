@@ -26,25 +26,10 @@
         }
     },
     "variables": {
-        "imagePublisher": "cisco",
-        "imageOffer": "cisco-csr-1000v",
-        "imageSKU": "16_6",
         "storageAccountName": "[concat('csrstgacct', uniqueString(resourceGroup().id))]",
-        "publicIPAddressName": "csr-pip",
-        "dnsPrefix": "[concat('csr-', uniqueString(resourceGroup().id))]",
-        "vmName": "vdc-csr-1",
-        "vmSize": "Standard_D2_V2",
-        "subnet1Name": "Hub-vnet-subnet1",
-        "subnet2Name": "Hub-vnet-subnet2",
         "vnetID": "[resourceId(parameters('vNetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vNetName'))]",
-        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet1Name'))]",
-        "subnet2Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet2Name'))]",
-        "addressPrefix": "10.1.0.0/16",
-        "subnet1Prefix": "10.101.1.0/24",
-        "subnet2Prefix": "10.101.2.0/24",
-        "subnet1StartAddress": "10.101.1.4",
-        "subnet2StartAddress": "10.101.2.4",
-        "nsgname": "[concat(variables('vmName'),'-SSH-SecurityGroup')]"
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/Hub-vnet-subnet1')]",
+        "subnet2Ref": "[concat(variables('vnetID'),'/subnets/Hub-vnet-subnet2')]",
     },
     "resources": [
         {
@@ -127,6 +112,9 @@
             "type": "Microsoft.Network/networkInterfaces",
             "name": "csr-nic0",
             "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'csr-pip')]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -231,12 +219,5 @@
                     }
                 }
             }
-        }
-    ],
-    "outputs": {
-        "hostname": {
-            "type": "string",
-            "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
-        }
-    }
+     
 }
