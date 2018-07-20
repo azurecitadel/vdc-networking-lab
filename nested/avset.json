@@ -146,6 +146,9 @@
                     },
                     "lbName": {
                         "value": "[variables('lbName')]"
+                    },
+                    "pip?": {
+                        "value": true
                     }
                 }
             },
