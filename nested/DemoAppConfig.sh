@@ -1,19 +1,15 @@
 #!/bin/bash - now in LF
 
 date +"%b %d %H:%M:%S"
+echo "Installing aptitude"
+sudo apt-get install --assume-yes -qq aptitude
+
+date +"%b %d %H:%M:%S"
 echo "Patching OS"
-sudo apt-get update -qq
-sudo apt-get dist-upgrade -qq
-sudo apt-get autoremove -qq 
-
-date +"%b %d %H:%M:%S"
-echo "Installing aptitude, lynx and moreutils"
-sudo apt-get install -qq aptitude lynx moreutils
-
-date +"%b %d %H:%M:%S"
-echo "Updating the labuser .bashrc for coloured prompts"
-[[ ! -f ~labuser/.bashrc.orig ]] && cp -p ~labuser/.bashrc ~labuser/.bashrc.orig
-curl --silent https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/nested/.bashrc > ~labuser/.bashrc
+sudo aptitude update --assume-yes --quiet
+sudo aptitude install nodejs git upstart monit lynx moreutils --assume-yes --quiet
+sudo aptitude full-upgrade --assume-yes --quiet
+sudo aptitude autoclean --assume-yes --quiet
 
 echo "-----------------------"
 date +"%b %d %H:%M:%S"
@@ -22,32 +18,30 @@ curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
 echo "-----------------------"
 
 date +"%b %d %H:%M:%S"
-# Install node.js
-date +"%b %d %H:%M:%S"
-echo "Installing nodejs - now includes npm"
-sudo aptitude install nodejs --quiet --assume-yes
-
-# Clone Git repo for demo app
-date +"%b %d %H:%M:%S"
-echo "Installing git and cloning the app"
-sudo aptitude install git --quiet --assume-yes
-
-date +"%b %d %H:%M:%S"
-echo "Cloning the app"
+echo "Cloning the demo app"
 git clone https://github.com/araffe/nodejs-demoapp.git ~labuser/nodejs-demoapp
-# git clone https://github.com/benc-uk/nodejs-demoapp.git ~labuser/nodejs-demoapp
+sudo chmod 755 ~labuser/nodejs-demoapp
+sudo chown labuser:labuser ~labuser/nodejs-demoapp
+
+date +"%b %d %H:%M:%S"
+echo "Configure the nodejs packages"
 cd ~labuser/nodejs-demoapp/
+/usr/bin/npm install --silent 
+
 
 date +"%b %d %H:%M:%S"
-echo "Installing forever"
-sudo -H /usr/bin/npm install forever -g --silent 2>/dev/null
-/usr/bin/npm install --silent 2>/dev/null
-which /usr/bin/forever
-/usr/bin/forever --version
+echo "Configure systemd and start node"
 
-date +"%b %d %H:%M:%S"
-echo "Run the app"
-/usr/bin/forever start ~labuser/nodejs-demoapp/bin/www 
-# /usr/bin/forever start ~labuser/nodejs-demoapp/
+sudo curl -sL --output /etc/systemd/system/demoapp.service https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/nested/demoapp.service
+
+sudo systemctl daemon-reload
+systemctl cat demoapp
+sudo systemctl enable demoapp
+sudo systemctl start demoapp
 
 /usr/bin/curl http://localhost:3000
+
+date +"%b %d %H:%M:%S"
+echo "Updating the labuser .bashrc for coloured prompts"
+[[ ! -f ~labuser/.bashrc.orig ]] && cp -p ~labuser/.bashrc ~labuser/.bashrc.orig
+curl --silent https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/nested/.bashrc > ~labuser/.bashrc
