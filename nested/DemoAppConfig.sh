@@ -2,10 +2,11 @@
 
 date +"%b %d %H:%M:%S"
 echo "Installing aptitude"
+sudo apt-get update
 sudo apt-get install --assume-yes -qq aptitude
 
 date +"%b %d %H:%M:%S"
-echo "Patching OS"
+echo "Patching OS using aptitude"
 sudo aptitude update --assume-yes --quiet
 sudo aptitude install nodejs npm git lynx moreutils --assume-yes --quiet
 sudo aptitude full-upgrade --assume-yes --quiet
