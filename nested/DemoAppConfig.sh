@@ -7,7 +7,7 @@ sudo apt-get install --assume-yes -qq aptitude
 date +"%b %d %H:%M:%S"
 echo "Patching OS"
 sudo aptitude update --assume-yes --quiet
-sudo aptitude install nodejs git upstart monit lynx moreutils --assume-yes --quiet
+sudo aptitude install nodejs npm git lynx moreutils --assume-yes --quiet
 sudo aptitude full-upgrade --assume-yes --quiet
 sudo aptitude autoclean --assume-yes --quiet
 
@@ -24,9 +24,11 @@ sudo chmod 755 ~labuser/nodejs-demoapp
 sudo chown labuser:labuser ~labuser/nodejs-demoapp
 
 date +"%b %d %H:%M:%S"
-echo "Configure the nodejs packages"
+echo "Configure nodejs and its packages"
 cd ~labuser/nodejs-demoapp/
+sudo /usr/bin/npm i npm@latest -g
 /usr/bin/npm install --silent 
+sudo npm audit fix
 
 
 date +"%b %d %H:%M:%S"
