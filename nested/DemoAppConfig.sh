@@ -48,3 +48,10 @@ date +"%b %d %H:%M:%S"
 echo "Updating the labuser .bashrc for coloured prompts"
 [[ ! -f ~labuser/.bashrc.orig ]] && cp -p ~labuser/.bashrc ~labuser/.bashrc.orig
 curl --silent https://raw.githubusercontent.com/azurecitadel/vdc-networking-lab/master/nested/.bashrc > ~labuser/.bashrc
+
+if [[ -f /var/run/reboot-required ]]
+then
+    date +"%b %d %H:%M:%S"
+    echo "System restart required"
+    sudo shutdown --no-wall --reboot now
+fi
