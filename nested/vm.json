@@ -165,7 +165,7 @@
                     "fileUris": [
                         "[variables('scriptUri')]"
                     ],
-                    "commandToExecute": "[concat('/bin/bash -x ', parameters('script'))]"
+                    "commandToExecute": "[concat('/bin/bash -x ', parameters('script'), ' 2>&1')]"
                 }
             },
             "dependsOn": [

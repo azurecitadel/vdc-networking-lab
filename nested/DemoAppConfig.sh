@@ -2,19 +2,18 @@
 
 echo "-----------------------"
 date +"%b %d %H:%M:%S"
-echo "Running setup script"
-curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
+echo "Running setup script - also runs apt-get update"
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 echo "-----------------------"
 
 date +"%b %d %H:%M:%S"
 echo "Installing aptitude"
-sudo apt-get update
 sudo apt-get install --assume-yes -qq aptitude
 
 date +"%b %d %H:%M:%S"
 echo "Patching OS using aptitude"
 sudo aptitude update --assume-yes --quiet
-sudo aptitude install nodejs npm git lynx moreutils --assume-yes --quiet
+sudo aptitude install nodejs git lynx moreutils --assume-yes --quiet
 sudo aptitude full-upgrade --assume-yes --quiet
 sudo aptitude autoclean --assume-yes --quiet
 
@@ -42,6 +41,7 @@ systemctl cat demoapp
 sudo systemctl enable demoapp
 sudo systemctl start demoapp
 
+sleep 10
 /usr/bin/curl http://localhost:3000
 
 date +"%b %d %H:%M:%S"
