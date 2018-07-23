@@ -25,6 +25,7 @@
         "avsetName": "[concat(parameters('prefix'), '-AvailabilitySet')]",
         "lbName": "[concat(parameters('prefix'), '-lb')]",
         "lbPipName": "[concat(parameters('prefix'), '-lb-pip')]",
+        "lbPipId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbPipName'))]",
         "vmUri": "[uri(deployment().properties.templateLink.uri, 'vm.json')]",
         "script": "DemoAppConfig.sh"
     },
@@ -148,7 +149,7 @@
                         "value": "[variables('lbName')]"
                     },
                     "pip?": {
-                        "value": true
+                        "value": false
                     }
                 }
             },
@@ -157,5 +158,11 @@
                 "count": "[parameters('vmCount')]"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "ipaddr": {
+            "type": "string",
+            "value": "[reference(variables('lbPipId')).ipAddress]"
+        }
+    }
 }
