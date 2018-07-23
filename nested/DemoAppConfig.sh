@@ -1,4 +1,10 @@
-#!/bin/bash - now in LF
+#!/bin/bash
+
+echo "-----------------------"
+date +"%b %d %H:%M:%S"
+echo "Running setup script"
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
+echo "-----------------------"
 
 date +"%b %d %H:%M:%S"
 echo "Installing aptitude"
@@ -11,12 +17,6 @@ sudo aptitude update --assume-yes --quiet
 sudo aptitude install nodejs npm git lynx moreutils --assume-yes --quiet
 sudo aptitude full-upgrade --assume-yes --quiet
 sudo aptitude autoclean --assume-yes --quiet
-
-echo "-----------------------"
-date +"%b %d %H:%M:%S"
-echo "Running setup script"
-curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash --
-echo "-----------------------"
 
 date +"%b %d %H:%M:%S"
 echo "Cloning the demo app"
@@ -31,7 +31,6 @@ sudo /usr/bin/npm i npm@latest -g
 /usr/bin/npm install
 sudo npm audit fix
 sudo chown -R labuser:labuser ~labuser/nodejs-demoapp
-
 
 date +"%b %d %H:%M:%S"
 echo "Configure systemd and start node"
