@@ -28,8 +28,9 @@ date +"%b %d %H:%M:%S"
 echo "Configure nodejs and its packages"
 cd ~labuser/nodejs-demoapp/
 sudo /usr/bin/npm i npm@latest -g
-/usr/bin/npm install --silent 
+/usr/bin/npm install
 sudo npm audit fix
+sudo chown -R labuser:labuser ~labuser/nodejs-demoapp
 
 
 date +"%b %d %H:%M:%S"
