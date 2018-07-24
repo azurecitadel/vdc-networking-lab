@@ -61,7 +61,7 @@
                     "name": "Spoke2-vnet",
                     "addressPrefixes": [  "10.2.0.0/16" ]
                 },
-                "subnets": [ 
+                "subnets": [
                     { "addressPrefix": "10.2.1.0/24", "name": "Spoke2-vnet-subnet1" },
                     { "addressPrefix": "10.2.2.0/24", "name": "Spoke2-vnet-subnet2" }
                 ]
@@ -270,8 +270,7 @@
                 "templateLink": {
                     "uri": "[variables('csrUri')]",
                     "contentVersion": "1.0.0.0"
-                },
-                "parameters": {}
+                }
             },
             "dependsOn": [
                 "Deploy-Hub-vNet"
