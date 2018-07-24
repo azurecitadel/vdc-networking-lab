@@ -54,8 +54,8 @@ then
     date +"%b %d %H:%M:%S"
     echo "System restart required - submitting at job"
     at now + 1 min <<-EOF
-        shutdown --reboot --no-wall now
-        EOF
+	shutdown --reboot --no-wall now
+	EOF
 fi
 
 exit 0
