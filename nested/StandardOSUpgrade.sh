@@ -1,14 +1,16 @@
 #!/bin/bash - now in LF
 
 date +"%b %d %H:%M:%S"
-echo "Patching OS"
+echo "Installing aptitude"
 sudo apt-get update --quiet
-sudo apt-get dist-upgrade --quiet --yes
-sudo apt-get autoremove -qq 
+sudo apt-get install --assume-yes -qq aptitude 
 
 date +"%b %d %H:%M:%S"
-echo "Installing aptitude, lynx and moreutils"
-sudo apt-get install --yes aptitude lynx moreutils
+echo "Patching OS using aptitude"
+sudo aptitude update --assume-yes --quiet
+sudo aptitude install git lynx moreutils --assume-yes --quiet
+sudo aptitude full-upgrade --assume-yes --quiet
+sudo aptitude autoclean --assume-yes --quiet
 
 date +"%b %d %H:%M:%S"
 echo "Updating the labuser .bashrc for coloured prompts"
