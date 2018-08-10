@@ -6,16 +6,21 @@ echo "Running setup script - also runs apt-get update"
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 echo "-----------------------"
 
-date +"%b %d %H:%M:%S"
-echo "Installing aptitude"
-sudo apt-get install --assume-yes -qq aptitude
+echo "Installing and updating"
+sudo apt-get update --quiet && \
+  sudo apt-get install --assume-yes -qq nodejs git lynx moreutils && \
+  sudo apt-get dist-upgrade --assume-yes --quiet
 
-date +"%b %d %H:%M:%S"
-echo "Patching OS using aptitude"
-sudo aptitude update --assume-yes --quiet
-sudo aptitude install nodejs git lynx moreutils --assume-yes --quiet
-sudo aptitude full-upgrade --assume-yes --quiet
-sudo aptitude autoclean --assume-yes --quiet
+#### date +"%b %d %H:%M:%S"
+#### echo "Installing aptitude"
+#### sudo apt-get install --assume-yes -qq aptitude
+#### 
+#### date +"%b %d %H:%M:%S"
+#### echo "Patching OS using aptitude"
+#### sudo aptitude update --assume-yes --quiet
+#### sudo aptitude install nodejs git lynx moreutils --assume-yes --quiet
+#### sudo aptitude full-upgrade --assume-yes --quiet
+#### sudo aptitude autoclean --assume-yes --quiet
 
 date +"%b %d %H:%M:%S"
 echo "Cloning the demo app"
