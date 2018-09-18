@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "prefix": {
+           "type": "string",
+           "defaultValue": "azure101",
+           "metadata": {
+                "description": "Prefix for virtual machine and avset"
+            }
+        },
+        "vnet": {
+           "type": "object",
+           "defaultValue": {
+                "vnet": {
+                    "name": "arm-vnet",
+                    "addressPrefixes": [  "10.76.0.0/16" ]
+                },
+                "subnets": [
+                    { "addressPrefix": "10.76.1.0/24", "name": "arm-vnet-subnet1" },
+                    { "addressPrefix": "10.76.2.0/24", "name": "arm-vnet-subnet2" }
+                ]
+            },
+            "metadata": {
+                "description": "Object describing virtual network"
+            }
+        }
+    },
+    "variables": {
+        "baseUri": "https://github.com/azurecitadel/vdc-networking-lab/blob/master",
+        "vnetUri": "[concat(variables('baseUri'), '/nested/vnet.json')]",
+        "avsetUri": "[concat(variables('baseUri'), '/nested/avset.json')]"
+    },
+    "resources": [
+        {
+            "comments": "Create vNet",
+            "name": "Deploy-vNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vnet": {
+                        "value": "[parameters('vnet')]"
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Create two VMs in an availability set with load balancing into first subnet in each spoke",
+            "name": "Deploy-Availability-Set",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Deploy-vNet"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('avsetUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vNetName": {
+                        "value": "[parameters('vnet').vnet.name]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('vnet').subnets[0].name]"
+                    },
+                    "prefix": {
+                        "value": "[parameters('prefix')]"
+                    }
+                }
+            }
+        }
+    ]
+}
